@@ -14,6 +14,8 @@ class Api_OrdersController extends Api_CommonController
     public function placeAction(){
         $Business = Common::ImportBusiness("Orders" ,"Api" );
         $params = $this->getParams(1) ;
+        $log = Log_file::getInstance( array('filename' => "MerchPlaceOrder" ) );
+        $log->Write("info" , "商户请求参数:" . json_encode($params ,JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ));
         global $_G;
         try{
             $data = $Business->placeOrder($params);
@@ -25,6 +27,7 @@ class Api_OrdersController extends Api_CommonController
             ];
             $this->echoJson( 1, "下单成功" , $resp );
         }catch(Exception $e ){
+            $log->Write("info" , "下单失败:" . $e->getMessage());
             $this->echoJson( $e->getCode(),$e->getMessage() );
         }
     }
