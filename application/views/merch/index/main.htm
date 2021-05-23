@@ -1,0 +1,140 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>{{siteName}} 控制台主页一</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet" href="{{layerCssPath}}" media="all">
+  <link rel="stylesheet" href="{{layerStaticDomain}}/style/admin.css" media="all">
+</head>
+<body>
+
+  <div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+
+      <div class="layui-col-md12">
+        <div class="layui-card">
+          <div class="layui-card-header">接入信息</div>
+          <div class="layui-card-body layui-text">
+            <table class="layui-table">
+              <colgroup>
+                <col width="300">
+                <col>
+              </colgroup>
+              <tbody>
+              <tr>
+                <td>商户名称</td>
+                <td>
+                  {{account['name']}}
+                </td>
+              </tr>
+                <tr>
+                  <td>登录账号</td>
+                  <td>
+                    {{userInfo['account']}}
+                  </td>
+                </tr>
+                <tr>
+                  <td>appid</td>
+                  <td>
+                    {{account['appid']}}
+                 </td>
+                </tr>
+                <tr>
+                  <td>秘钥</td>
+                  <td>
+                    ******************************
+                    <blockquote class="layui-elem-quote">秘钥千万不要泄露了，秘钥属于敏感信息，如果怀疑泄露，请尽快的进行修改</blockquote>
+                 </td>
+                </tr>
+                <tr>
+                  <td>订单的异步回调通知地址</td>
+                  <td>
+                    {{account['notify_url']|raw}}
+                    <div class="layui-elem-quote">使用场景：<span style="color:darkred">当订单确认成功</span>的时候，我方会发起一个POST请求到此地址，请注意接收和处理业务</div>
+                 </td>
+                </tr>
+
+              <tr>
+                <td>补单异步回调通知地址</td>
+                <td>
+                  {{account['supplement_url']|raw}}
+                  <br>
+                  <blockquote class="layui-elem-quote">使用场景：<span style="color:darkred">当掉单的时候</span>，我方会发起一个补单的POST请求到此地址，请注意接收和处理业务</blockquote>
+                </td>
+              </tr>
+
+              <tr>
+                <td>API接口请求地址</td>
+                <td>
+                  <h1 style="color: red;">{{api_domain|raw}}</h1>
+                </td>
+              </tr>
+
+              <tr>
+              <td>商户白名单</td>
+              <td>
+                  <textarea disabled class="layui-textarea">{{account['white_list_ip']|raw}}</textarea>
+
+              </td>
+              </tr>
+
+
+              <tr>
+                <td colspan="2">
+                  <blockquote class="layui-elem-quote">
+                    商户注意：异步回调通知请注意接收数据 ， 处理相关的业务逻辑！（这边有可能发起重复的请求 , 商户要做去重的机制）
+                    <br />
+                    对接商户的订单一定要判断状态，和 验证签名 ！
+                  </blockquote>
+                </td>
+
+              </tr>
+
+
+
+                <tr>
+                  <td></td>
+                  <td>
+                    <button class="layui-btn layui-btn-sm layui-btn-normal editBase"><i class="layui-icon"></i>基本信息配置</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+  </div>
+
+    <script src="{{layerStaticDomain}}/layui/layui.js"></script>
+  <script>
+  layui.config({
+    base: '{{layerStaticDomain}}/' //静态资源所在路径
+  }).extend({
+    index: 'lib/index' //主入口模块
+  }).use(['index'],function(){
+    var $ = layui.$
+    $(".editBase").click( function(){
+        edit();
+    });
+    function edit(){
+      _table = layer.open({
+        type: 2
+        ,title: "基本信息配置" // 标题
+        ,content: "/merch_user/base"  // url
+        ,maxmin: true // 是否可以全屏
+        ,area: ['80%', '80%'] // 弹出层的宽/高
+      });
+    }
+  });
+  </script>
+</body>
+</html>
+

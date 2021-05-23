@@ -1,0 +1,209 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>{{siteName}}--管理系统首页</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet" href="{{layerCssPath}}" media="all">
+  <link rel="stylesheet" href="{{layerStaticDomain}}/style/admin.css" media="all">
+
+  <style type="text/css">
+
+    .echart_content{
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      padding: 20px;
+    }
+    .echart_content>.echart_content_box{
+      width: 50%;
+      height: 300px;
+      margin-bottom: 100px;
+    }
+    .echart_content>.echart_content_box div{
+      width: 80%;
+      margin: auto;
+    }
+    @media screen and (max-width: 750px) {
+      .echart_content>.echart_content_box{
+        width: 100%;
+        height: 300px;
+      }
+    }
+    .col-md-6 .box{
+      overflow:hidden;
+    }
+    .box{
+      /*margin-bottom:64px;*/
+      height: 300px;
+    }
+    .box_height{
+      height: 500px;
+    }
+    a{
+      color: #3c8dbc;
+    }
+    .table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th{
+      vertical-align: middle;
+    }
+    .box-header>img{
+      width: 20px;
+      height: 20px;
+    }
+    .box-header>h3{
+      line-height: 20px!important;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+
+      <div class="layui-col-md12">
+        <div class="layui-card">
+          <div class="layui-card-header">用户信息</div>
+          <div class="layui-card-body layui-text">
+            <table class="layui-table">
+              <colgroup>
+                <col width="100">
+                <col>
+              </colgroup>
+              <tbody>
+                <tr>
+                  <td>昵称</td>
+                  <td>
+                    {{userInfo['nick']}}
+                  </td>
+                </tr>
+                <tr>
+                  <td>登录账号</td>
+                  <td>
+                    {{userInfo['username']}}
+                 </td>
+                </tr>
+                <tr>
+                  <td>是否管理员</td>
+                  <td>
+                    {% if userInfo['super'] == 1 %}
+                    <button class="layui-btn layui-btn-normal">是</button>
+                    {% else %}
+                    <button class="layui-btn layui-btn-primary layui-btn-radius">否</button>
+                    {% endif %}
+
+                 </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+<div class="layui-row">
+        <div class="chartsbox">
+          <div class="layui-col-md6">
+            <div class="box" id="ecahrt1">
+            </div>
+          </div>
+          <div class="layui-col-md6">
+            <div class="box" id="ecahrt2">
+            </div>
+          </div>
+        </div>
+</div>
+
+      <div class="layui-row">
+        <div class="chartsbox">
+          <div class="layui-col-md6">
+            <div class="box" id="ecahrt3">
+            </div>
+          </div>
+          <div class="layui-col-md6">
+            <div class="box" id="ecahrt4">
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="layui-row">
+        <div class="chartsbox">
+          <div class="layui-col-md6">
+            <div class="box" id="ecahrt5">
+            </div>
+          </div>
+          <div class="layui-col-md6">
+            <div class="box" id="ecahrt6">
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+
+      <script src="{{layerStaticDomain}}/addons/echarts/echarts.min.js" type="text/javascript" charset="utf-8"></script>
+      <script src="{{layerStaticDomain}}/addons/echarts/echartFun.js" type="text/javascript" charset="utf-8"></script>
+    <script src="{{layerStaticDomain}}/layui/layui.js"></script>
+
+  <script>
+
+    // 今日订单统计
+    let colorList1 = ['#ed9678','#ed9678','#5ab1ef']; // 柱形图柱子背景颜色
+    let orderStatistics = [{{today_order_num['today_error_num']}} ,{{today_order_num['today_success_num']}},{{today_order_num['today_total']}}];
+    let orderStatisticsTitle = ['失败订单数', '成功订单数', '总订单数'];
+
+    creationEchart("ecahrt1", "今日订单数据",colorList1, orderStatisticsTitle, orderStatistics);
+
+
+    // 累计订单统计
+    let colorList2 = ['#ed9678','#ed9678','#5ab1ef']; // 柱形图柱子背景颜色
+    let allorderStatistics = [{{order_num['error_num']}},{{order_num['success_num']}},{{order_num['total']}}];
+    let allorderStatisticsTitle = ['失败订单数', '成功订单数', '总订单数'];
+    creationEchart("ecahrt2", "累计订单数据",colorList2, allorderStatisticsTitle, allorderStatistics);
+
+    // 今日订单金额统计
+    let colorList6 = ['#ed9678','#ed9678','#ed9678','#5ab1ef']; // 柱形图柱子背景颜色
+    let orderStatisticsMoney = [{{today_order_money['merch_money']}},{{today_order_money['error_num']}},{{today_order_money['success_num']}},{{today_order_money['total']}}];
+    let orderStatisticsTitleMoney = ['成功商户到账币数量','失败订单币数量', '成功订单币数量', '总订单币数量'];
+    creationEchart("ecahrt3", "今日订单币数量",colorList6, orderStatisticsTitleMoney, orderStatisticsMoney);
+
+    // 累计订单金额统计
+    let colorList7 = ['#ed9678','#ed9678','#ed9678','#5ab1ef']; // 柱形图柱子背景颜色
+    let allorderStatisticsMoney = [{{all_order_money['error_num']}},{{all_order_money['success_num']}},{{all_order_money['total']}}];
+    let allorderStatisticsTitleMoney = ['失败订单币数量', '成功订单币数量', '总订单币数量'];
+    creationEchart("ecahrt4", "累计订单币数量",colorList7, allorderStatisticsTitleMoney, allorderStatisticsMoney);
+
+    // 昨日订单统计
+    let colorList9 = ['#ed9678','#ed9678','#5ab1ef']; // 柱形图柱子背景颜色
+    let orderStatistics9 = [{{yestady_order_num['today_error_num']}} ,{{yestady_order_num['today_success_num']}},{{yestady_order_num['today_total']}}];
+    let orderStatisticsTitle9 = ['失败订单数', '成功订单数', '总订单数'];
+
+    creationEchart("ecahrt5", "昨日订单数据",colorList9, orderStatisticsTitle9, orderStatistics9);
+
+    // 昨日订单金额统计
+    let colorList10 = ['#ed9678','#ed9678','#5ab1ef']; // 柱形图柱子背景颜色
+    let orderStatisticsMoney10 = [{{yestady_order_money['error_num']}},{{yestady_order_money['success_num']}},{{yestady_order_money['total']}}];
+    let orderStatisticsTitleMoney10 = ['失败订单币数量', '成功订单币数量', '总订单币数量'];
+    creationEchart("ecahrt6", "昨日订单币数量",colorList10, orderStatisticsTitleMoney10, orderStatisticsMoney10);
+
+
+
+    layui.config({
+    base: '{{layerStaticDomain}}/' //静态资源所在路径
+  }).extend({
+    index: 'lib/index' //主入口模块
+  }).use(['index'] , function(){
+    var $ = layui.$
+
+
+  });
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>{{siteName}}--管理系统首页</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet" href="{{layerCssPath}}" media="all">
+  <link rel="stylesheet" href="{{layerStaticDomain}}/style/admin.css" media="all">
+
+</head>
+<body class="layui-layout-body">
+  
+  <div id="LAY_app">
+    <div class="layui-layout layui-layout-admin">
+      <div class="layui-header">
+        <!-- 头部区域 -->
+        <ul class="layui-nav layui-layout-left">
+          <li class="layui-nav-item layadmin-flexible" lay-unselect>
+            <a href="javascript:;" layadmin-event="flexible" title="侧边伸缩">
+              <i class="layui-icon layui-icon-shrink-right" id="LAY_app_flexible"></i>
+            </a>
+          </li>
+     
+          <li class="layui-nav-item" lay-unselect>
+            <a href="javascript:;" layadmin-event="refresh" title="刷新">
+              <i class="layui-icon layui-icon-refresh-3"></i>
+            </a>
+          </li>
+          
+        </ul>
+        <ul class="layui-nav layui-layout-right" lay-filter="layadmin-layout-right">
+          
+      
+          <li class="layui-nav-item layui-hide-xs" lay-unselect>
+            <a href="javascript:;" layadmin-event="theme">
+              <i class="layui-icon layui-icon-theme"></i>
+            </a>
+          </li>
+          <li class="layui-nav-item layui-hide-xs" lay-unselect>
+            <a href="javascript:;" layadmin-event="note">
+              <i class="layui-icon layui-icon-note"></i>
+            </a>
+          </li>
+          <li class="layui-nav-item layui-hide-xs" lay-unselect>
+            <a href="javascript:;" layadmin-event="fullscreen">
+              <i class="layui-icon layui-icon-screen-full"></i>
+            </a>
+          </li>
+          <li class="layui-nav-item" lay-unselect>
+            <a href="javascript:;">
+              <cite>{{userInfo.nick}}</cite>
+            </a>
+            <dl class="layui-nav-child">
+              <dd ><a style="color:blue;" href="{{MERCH_DOMAIN}}Merch_login/index" target="_blank">商户（盘口）登录</a></dd>
+              <dd ><a style="color:red;" href="{{MERCH_DOMAIN}}doc.html" target="_blank">商户对接文档</a></dd>
+              <dd ><a style="color:blue;" href="{{AGENT_DOMAIN}}Agent_login/index" target="_blank">代理登录</a></dd>
+              <dd><a lay-href="{{getu('admin_user/editpasswd')}}">修改密码</a></dd>
+              <dd><a href="{{getu('Admin_login/loginOut')}}">退出</a></dd>
+<!--
+			  <dd><a href="{{getu('Collect_login/loginOut')}}" target="_blank">码商登录</a></dd>
+-->
+            </dl>
+          </li>
+          <li class="layui-nav-item layui-show-xs-inline-block layui-hide-sm" lay-unselect>
+            <a href="javascript:;" layadmin-event="more"><i class="layui-icon layui-icon-more-vertical"></i></a>
+          </li>
+        </ul>
+      </div>
+      
+      <!-- 侧边菜单 -->
+      <div class="layui-side layui-side-menu">
+        <div class="layui-side-scroll">
+          <div class="layui-logo" lay-href="{{getu('admin_index/home')}}">
+            <span style="font-size: 24px;font-weight: bold;">总后台管理系统</span>
+          </div>
+          
+          <ul class="layui-nav layui-nav-tree" lay-shrink="all" id="LAY-system-side-menu" lay-filter="layadmin-system-side-menu">
+            <li data-name="home" class="layui-nav-item layui-nav-itemed">
+              <a href="javascript:;" lay-tips="主页" lay-direction="2">
+                <i class="layui-icon layui-icon-home"></i>
+                <cite>主页</cite>
+              </a>
+              <dl class="layui-nav-child">
+                <dd data-name="console" class="layui-this">
+                  <a lay-href="{{getu('admin_index/home')}}">控制台</a>
+                </dd>
+               
+              </dl>
+            </li>
+            {% for keys ,it in menu %}
+            <li  class="layui-nav-item">
+              {% if it.child|length > 0 %}
+              <a href="javascript:;" lay-tips="{{it.tips}}" lay-direction="2">
+                <i class="{{it.icon_class}}"></i>
+                <cite>{{it.name}}</cite>
+              </a>
+              {% else %}
+              <a  lay-href="{{it.href}}" href="javascript:;" lay-tips="{{it.tips}}" lay-direction="2">
+                <i class="{{it.icon_class}}"></i>
+                <cite>{{it.name}}</cite>
+              </a>
+              {% endif %}
+
+              {% if it.child|length > 0 %}
+              <dl class="layui-nav-child">
+                {% for skeys,its in it.child %}
+                {% if its.child|length > 0 %}
+                  <dd data-name="grid">
+                  <a href="javascript:;">{{its.name}}</a>
+                  <dl class="layui-nav-child">  
+                    {% for akeys ,aits in its.child %}
+                    <dd data-name="demo_{{keys}}-{{skeys}}-{{akeys}}"> 
+                    <a lay-href="{{aits.href}}" lay-text="{{aits.name}}">{{aits.name}}</a> 
+                    </dd>  
+                    {% endfor %}
+                  </dd>
+                  </dl> 
+                {% else %}
+                 <dd ><a lay-href="{{its.href}}">{{its.name}}</a></dd>
+                {% endif %}
+                
+                {% endfor %}
+              </dl>
+              {% endif %}
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+
+      <!-- 页面标签 -->
+      <div class="layadmin-pagetabs" id="LAY_app_tabs">
+        <div class="layui-icon layadmin-tabs-control layui-icon-prev" layadmin-event="leftPage"></div>
+        <div class="layui-icon layadmin-tabs-control layui-icon-next" layadmin-event="rightPage"></div>
+        <div class="layui-icon layadmin-tabs-control layui-icon-down">
+          <ul class="layui-nav layadmin-tabs-select" lay-filter="layadmin-pagetabs-nav">
+            <li class="layui-nav-item" lay-unselect>
+              <a href="javascript:;"></a>
+              <dl class="layui-nav-child layui-anim-fadein">
+                <dd layadmin-event="closeThisTabs"><a href="javascript:;">关闭当前标签页</a></dd>
+                <dd layadmin-event="closeOtherTabs"><a href="javascript:;">关闭其它标签页</a></dd>
+                <dd layadmin-event="closeAllTabs"><a href="javascript:;">关闭全部标签页</a></dd>
+              </dl>
+            </li>
+          </ul>
+        </div>
+        <div class="layui-tab" lay-unauto lay-allowClose="true" lay-filter="layadmin-layout-tabs">
+          <ul class="layui-tab-title" id="LAY_app_tabsheader">
+            <li lay-id="{{getu('index/home')}}" lay-attr="{{getu('index/home')}}" class="layui-this"><i class="layui-icon layui-icon-home"></i></li>
+          </ul>
+        </div>
+      </div>
+      
+      
+      <!-- 主体内容 -->
+      <div class="layui-body" id="LAY_app_body">
+        <div class="layadmin-tabsbody-item layui-show">
+          <iframe src="{{getu('admin_index/home')}}" frameborder="0" class="layadmin-iframe"></iframe>
+        </div>
+      </div>
+      
+      <!-- 辅助元素，一般用于移动设备下遮罩 -->
+      <div class="layadmin-body-shade" layadmin-event="shade"></div>
+    </div>
+  </div>
+  <audio id="myaudio" src="" controls="controls"  autoplay="autoplay"  hidden="true" style="display:none" ></audio>
+
+  <script src="{{layerStaticDomain}}/layui/layui.js"></script>
+  <script>
+  layui.config({
+    base: '{{layerStaticDomain}}/' //静态资源所在路径
+  }).extend({
+    index: 'lib/index' //主入口模块
+  }).use('index',function () {
+    localStorage.removeItem("layuiAdmin");
+    var str = '{"theme":{"color":{"main":"#50314F","logo":"#50314F","selected":"#7A4D7B","header":"#50314F","alias":"purple-red-header","index":12}}}';
+    localStorage.setItem("layuiAdmin",str);
+
+    var $ = layui.$
+    /*var intervalOrderInfo = setInterval(function () {
+      $.post("/Api_pay/query", {
+        order_sn: "{{info.order_sn}}"
+      }, function (response) {
+        var data = response;
+        console.log(data)
+
+      }, "json");
+    }, 3000);*/
+   // setInterval(notic_admin,  5000 )
+
+    setInterval(get_new_merchants_withdraw,  5000 )
+    function get_new_order(){
+      $.ajax({
+        url:"/Admin_Index/getNewOrder",
+        type:'GET',
+        success:function(d) {
+          layer.closeAll('loading');
+          layer.closeAll('loading');
+          if(d.data.has_new == 1){
+            playsound()
+            dialog_notice("你有新的订单请注意查看")
+          }
+        },
+        error:function(){
+          layer.closeAll('loading');
+          //layer.msg('请重试...', {icon: 5});
+        },
+        dataType:'json'
+      });
+    }
+
+
+    function get_new_merchants_withdraw(){
+      $.ajax({
+        url:"/Admin_Index/getNewwithdraw",
+        type:'GET',
+        success:function(d) {
+          layer.closeAll('loading');
+          if(d.data.has_new == 1){
+            playsound_withdraw()
+            dialog_notice("你有新的商户提现请注意查看")
+          }
+        },
+        error:function(){
+          layer.closeAll('loading');
+          //layer.msg('请重试...', {icon: 5});
+        },
+        dataType:'json'
+      });
+    }
+    function playsound_withdraw()
+    {
+      var myAuto = document.getElementById('myaudio');
+      myAuto.src="/resource/static/css/tixian-tts-auido.mp3";
+    }
+
+    function playsound_order()
+    {
+      var myAuto = document.getElementById('myaudio');
+      myAuto.src="/resource/static/css/bugscaner-tts-auido.mp3";
+    }
+
+    function dialog_notice( msg = '' , time = 5000  ){
+      layer.open({
+        type: 1,
+        content: "<div style='text-align:center;padding: 10px;color:red;'>"+msg+"</div>",
+        offset:"rb",
+        area: ['300px', '100px'],
+        closeBtn : 0 ,
+        shade: 0 ,
+        time : time,
+        shift :1 ,
+        skin: 'layui-layer-molv',
+        title :"系统提示"
+      })
+    }
+
+
+  });
+
+
+
+
+
+
+
+
+  </script>
+  
+
+</body>
+</html>
+
+

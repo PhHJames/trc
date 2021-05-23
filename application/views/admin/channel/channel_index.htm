@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{{siteName}}-通道管理</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="{{layerCssPath}}?version={{version}}" media="all">
+    <link rel="stylesheet" href="{{layerStaticDomain}}/style/admin.css?version={{version}}" media="all">
+    <style>
+
+
+    </style>
+</head>
+<body>
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto">
+            <div class="layui-card-body">
+                <form  id="myform" class="layui-form"  onsubmit="return false ">
+                <div class="test-table-reload-btn" >
+                    <div class="layui-inline">
+                        <label class="layui-form-label">状态</label>
+                        <div class="layui-input-inline">
+                            <select name="status" id="status">
+                                <option value="0">请选择</option>
+                                <option value="1">开启</option>
+                                <option value="2">关闭</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <div class="layui-input-inline">
+                            <button id="search" class="layui-btn layuiadmin-btn-comm" data-type="reload" lay-submit="" lay-filter="LAY-app-contcomm-search">
+                                <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+                </form>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="layui-row">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-body">
+
+                    <table class="layui-hide" id="table_src" lay-filter="test"></table>
+                    {% verbatim %}
+                    <script type="text/html" id="test-table-switchTpl">
+                        <!-- 这里的 checked 的状态只是演示 -->
+                        <input type="checkbox" lay-filter="test-table-status" name="status" lay-skin="switch" lay-text="正常|禁用"
+                               value="{{ d.status }}" data-json="{{ encodeURIComponent(JSON.stringify(d)) }}" {{ d.status == 1 ? 'checked' : '' }}>
+                    </script>
+                    {% endverbatim %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/html" id="role">
+    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+</script>
+<script src="{{layerStaticDomain}}/layui/layui.js"></script>
+<script>
+    var _table = null;
+    layui.config({
+        version: "{{version}}",
+        base: '{{layerStaticDomain}}/' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'form', 'table'],function(){
+        var $ = layui.$
+            ,admin = layui.admin
+            ,element = layui.element
+            ,form = layui.form,
+            table = layui.table;
+        form.render(null, 'component-form-element');
+        table.render({
+            elem: '#table_src'
+            ,url:'{{getu("Admin_Channel/index" , "inajax=1")}}'
+            ,title: '后台用户'
+            ,toolbar: true
+            ,defaultToolbar:['filter']
+            ,cols: [[
+                {field:'id', title:'编号', width:100, minWidth: 60, sort: true},
+                {field:'channel', title:'通道编码', width:200},
+                {field:'name', title:'通道名称', width:200},
+                {field:'alias', title:'通道别名（主要前端显示）'},
+                {field:'remark', title:'备注', width:200},
+                //{field:'fee', title:'费率', width:100},
+                {field:'min_money', title:'最低金额￥', width:100},
+                {field:'max_money', title:'最大金额￥', width:100},
+                {field:'status', title:'状态', width:80, templet: function(res){
+                        if (res.status == '1') {
+                            return '<button class="layui-btn layui-btn-normal layui-btn-xs">开启</button>';
+                        } else if(res.status == '2') {
+                            return '<button class="layui-btn layui-btn-danger layui-btn-xs">关闭</button>' ;
+                        }
+                        else{
+                            return '未知';
+                        }
+                    }},
+
+                {title:'操作', toolbar: '#role', minWidth:100, width:150}
+            ]]
+            ,id: 'tables_id'
+            ,page: true
+            ,limits: [10,20,30,40,50] // 每页展示条数
+            ,limit: {{pageSize}} // 每页默认显示的数量;注意：需要和后台首次传递过来的条数相同
+    });
+
+        // 操作功能
+        table.on('tool(test)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'edit'){
+                addOrEdit(data.id)
+            }else if (obj.event === 'del'){
+                deleteUser(data.id)
+            }else if (obj.event === 'preview'){
+                preview(data.id)
+            }
+        });
+        $('#search').click(function () {
+            search();
+        });
+
+        $('#search_ipt').keydown(function (event) {
+            if (event.keyCode === 13) {
+                search();
+            }
+        });
+
+        function search() {
+            var $where = getWhere();
+            table.reload('tables_id', {
+                page: {
+                    curr: 1 //重新从第 1 页开始
+                }
+                ,where: $where
+            });
+        };
+        function getWhere(){
+            var _data = $("#myform").serializeArray()
+            var  o_data = {}
+            for( var i in _data ){
+                o_data[_data[i]['name']] = _data[i]['value']
+            }
+            return o_data
+        }
+        // 添加权限或者编辑权限
+        function addOrEdit(id){
+            var title = '添加商户',
+                _url = "{{getu('Admin_Channel/add')}}", // 权限数据请求地址
+                flag = true; // 用于判断关闭按钮触发还是数据提交触发
+            var area = ['40%', '40%']
+            if (id > 0  ) {
+                title = "修改通道";
+                _url = "{{getu('Admin_Channel/edit')}}?id="+id
+                area = ['60%', '55%']
+            }
+            _table = layer.open({
+                type: 2
+                ,title: title // 标题
+                ,content: _url  // url
+                ,maxmin: true // 是否可以全屏
+                ,area: area // 弹出层的宽/高
+                ,end: function () { // 页面销毁后执行
+                    if (flag) { // 数据提交触发
+                        var $where = getWhere();
+                        table.reload('tables_id', {
+                            where: $where
+                        });
+                    }
+                }
+                ,cancel: function () { // 右上角关闭按钮触发的回调
+                    flag = false;
+                }
+            });
+        }
+
+
+    });
+    // 用于role_add或者role_edit页面调用;
+    function closeAndLoadData(){
+        layer.close(_table); // 销毁layer弹出层
+    }
+
+</script>
+</body>
+</html>

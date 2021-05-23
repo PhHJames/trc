@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{{siteName}}-平台日志</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="{{layerCssPath}}?version={{version}}" media="all">
+    <link rel="stylesheet" href="{{layerStaticDomain}}/style/admin.css?version={{version}}" media="all">
+</head>
+<body>
+<div class="layui-fluid">
+    <blockquote class="layui-elem-quote layui-quote-nm">
+        平台日志
+        <br>——为了方便快捷的查询出错误和日志
+    </blockquote>
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto">
+            <div class="layui-card-body">
+                <form  id="myform" class="layui-form"  onsubmit="return false ">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">类型</label>
+                        <div class="layui-input-inline">
+                            <input class="layui-input" name="type" placeholder="请输入类型"  autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">等级</label>
+                        <div class="layui-input-inline">
+                            <select name="level" id="">
+                                <option value="">请选择</option>
+                                <option value="info">info</option>
+                                <option value="error">error</option>
+                                <option value="waring">waring</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <div class="layui-input-inline">
+                            <button id="search" class="layui-btn layuiadmin-btn-comm" data-type="reload" lay-submit="" lay-filter="LAY-app-contcomm-search">
+                                <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+
+</div>
+
+    <div class="layui-row">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-body">
+                    <table class="layui-hide" id="table_src" lay-filter="test"></table>
+                    <script type="text/html" id="test-table-operate-barDemo">
+                        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看请求参数</a>
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<script src="{{layerStaticDomain}}/layui/layui.js"></script>
+<script>
+    var _table = null;
+    layui.config({
+        version: "{{version}}",
+        base: '{{layerStaticDomain}}/' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'form', 'table'],function(){
+        var $ = layui.$
+            ,admin = layui.admin
+            ,element = layui.element
+            ,form = layui.form,
+            table = layui.table;
+
+        form.render(null, 'component-form-element');
+        table.render({
+            elem: '#table_src'
+            ,url:'{{getu("Admin_Platlog/index" , "inajax=1")}}'
+            ,title: ''
+            ,toolbar: true
+            ,defaultToolbar:['filter']
+            ,cols: [[
+                {field:'id', title:'编号', width:100, sort: true ,align :'center'},
+                {field:'type', title:'类型', width:180,align :'center'},
+                {field:'level', title:'等级' ,align :'center', width: 80},
+                {field:'create_date', title:'添加时间', width: 180, sort: true ,align :'center'},
+                {field:'message', title:'具体信息', align :'center'},
+                ,{width:100, align:'center', fixed: 'right', toolbar: '#test-table-operate-barDemo'}
+            ]]
+            ,id: 'tables_id'
+            ,page: true
+            ,limits: [10,20,30,40,50] // 每页展示条数
+            ,limit: {{pageSize}} // 每页默认显示的数量;注意：需要和后台首次传递过来的条数相同
+    });
+
+        //监听工具条
+        table.on('tool(test)', function(obj){
+            var data = obj.data;
+            console.log(data.request)
+            if(obj.event === 'detail'){
+                layer.alert(data.message, {
+                    skin: 'layui-layer-molv'
+                    ,closeBtn: 0
+                });
+            }
+        });
+        $('#search').click(function () {
+            search();
+        });
+        $('#search_ipt').keydown(function (event) {
+            if (event.keyCode === 13) {
+                search();
+            }
+        });
+
+        function search() {
+            var $where = getWhere();
+            table.reload('tables_id', {
+                page: {
+                    curr: 1 //重新从第 1 页开始
+                }
+                ,where: $where
+            });
+        };
+        function getWhere(){
+            var _data = $("#myform").serializeArray()
+            var  o_data = {}
+            for( var i in _data ){
+                o_data[_data[i]['name']] = _data[i]['value']
+            }
+            return o_data
+        }
+
+
+    });
+    // 用于role_add或者role_edit页面调用;
+    function closeAndLoadData(){
+        layer.close(_table); // 销毁layer弹出层
+    }
+
+</script>
+</body>
+</html>

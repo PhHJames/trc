@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>l{{siteName}}--角色修改</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet" href="{{layerCssPath}}?version={{version}}" media="all">
+  <link rel="stylesheet" href="{{layerStaticDomain}}/style/role.css?version={{version}}" media="all">
+  <link rel="stylesheet" href="{{layerStaticDomain}}/style/admin.css?version={{version}}" media="all">
+</head>
+<body>
+<div class="layui-card-body layui-form">	
+    <form id="role_from">
+    	<input type="hidden" name="role_id" value="{{info.role_id}}" />
+        <div class="layui-form-item">
+        <label class="layui-form-label">角色名称</label>
+        <div class="layui-input-block">
+          <input type="text" name="role_name" id="role_name" placeholder="请输入角色名称" autocomplete="off" value="{{info.role_name}}" class="layui-input">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">权限范围</label>
+        <div class="layui-input-block" >
+            <div class="eleTree ele1" lay-filter="data1"></div>
+        </div>
+      </div>
+
+    <div class="layui-form-item">
+      <label class="layui-form-label">具体描述</label>
+      <div class="layui-input-block">
+        <textarea type="text" name="remark" id="role_descr" lay-verify="required" autocomplete="off" class="layui-textarea">{{info.remark}}</textarea>
+      </div>
+    </div>
+    <div class="layui-form-item box-center">
+      <button class="layui-btn">提交</button>
+    </div>
+  </form>
+</div>
+  <script src="{{layerStaticDomain}}/layui/layui.js"></script>  
+  <script>
+	  layui.config({
+        version: "{{version}}",
+	    base: '{{layerStaticDomain}}/' //静态资源所在路径
+	  }).extend({
+	    index: 'lib/index' //主入口模块
+	  }).use(['index', 'form', 'table', 'eleTree'], function(){
+	    var $ = layui.$
+	    ,form = layui.form
+	    ,table = layui.table
+	    ,element = layui.element;
+        var eleTree = layui.eleTree;
+        eleTree.render({
+            elem: '.ele1',
+            //url: "{{getu('extra/getRoleNav')}}",
+            //type: "GET",
+            data: {{jsonRole|raw}},
+            showCheckbox: true,
+            //contextmenuList: ["copy","add","edit","remove"],
+            drag: true,
+            accordion: true
+        });
+    	//表单提交
+			$('#role_from').submit(function () {
+				var loading = null,	// 加载状态
+			  		role_name,	// 角色名称
+			  		role_descr;	// 角色描述
+				  role_name = $('#role_name').val();
+				  if (role_name.trim() === '') {
+				  	layer.alert('角色名称不能为空',{icon:5});
+				  	return false;
+				  }
+                  var arr = new Array();
+                    $("input:checkbox[name='eleTree-node']").each(function(i){
+                        if($(this).attr("eletree-status") == 1 || $(this).attr("eletree-status") == 2 ) {
+                           arr.push($(this).val()) 
+                        }
+                    });
+				  role_descr = $('#role_descr').val();
+                  var _data = $('#role_from').serializeArray()
+                  //_data['modules'] = JSON.stringify(arr)
+                  _data.push({name : "modules" , value : JSON.stringify(arr)})
+				  $.ajax({
+				  	type:'POST',
+				  	url: '{{getu("admin_admin/editRole")}}',
+				  	data: _data,
+				  	dataType: 'JSON',
+				  	success: function (res) {
+				  		layer.close(loading);
+			        if( res['code'] != 1 ){
+			          layer.msg(res['msg'] , {icon : 5 } )
+			          return false;
+			        }
+			        layer.alert('修改成功', {}, function(){
+								parent.closeAndLoadData(); // 调用role.html的方法,用于关闭当前页面
+			        });
+				  	},
+				  	beforeSend: function(){
+			      	loading = layer.load(0, {shade: [0.1,'#fff']})
+			      },
+			      error: function (){
+			        layer.close(loading)
+			        layer.msg("网络繁忙请稍后" , {icon : 5 } )
+			      }
+				  });
+			    return false;
+			 });
+})
+  </script>
+</body>
+</html>

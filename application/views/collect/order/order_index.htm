@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>{{siteName}}-订单管理</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet" href="{{layerCssPath}}?version={{version}}" media="all">
+  <link rel="stylesheet" href="{{layerStaticDomain}}/style/admin.css?version={{version}}" media="all">
+</head>
+<body>
+  <div class="layui-fluid">
+    <div class="layui-card">
+      <div class="layui-card-header">实时数据统计</div>
+      <div class="layui-card-body layui-text">
+        <table class="layui-table">
+          <tbody>
+          <tr>
+            <td>今日订单数</td>
+            <td>今日订单金额</td>
+            <td>昨日订单数</td>
+            <td>昨日订单金额</td>
+          </tr>
+          <tr>
+            <td>
+              <p><a >订单数:{{todayData.today_total}}</a></p>
+              <p>成功订单数:{{todayData.today_success_num}}</p>
+              <p>失败订单数:{{todayData.today_error_num}}</p>
+            </td>
+            <td style="font-size: 18px">
+              <p><a >总订单金额:{{TodayOrderMoney.total}}</a></p>
+              <p>成功订单金额:{{TodayOrderMoney.success_num}}</p>
+              <p>失败订单金额:{{TodayOrderMoney.error_num}}</p>
+            </td>
+            <td>
+              <p><a >订单数:{{yestdayData.today_total}}</a></p>
+              <p>成功订单数:{{yestdayData.today_success_num}}</p>
+              <p>失败订单数:{{yestdayData.today_error_num}}</p>
+            </td>
+            <td style="font-size: 18px">
+              <p><a >总订单金额:{{yestdayOrderMoney.total}}</a></p>
+              <p>成功订单金额:{{yestdayOrderMoney.success_num}}</p>
+              <p>失败订单金额:{{yestdayOrderMoney.error_num}}</p>
+            </td>
+          </tr>
+
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="layui-card">
+      <div class="layui-form layui-card-header layuiadmin-card-header-auto">
+          <div class="layui-card-body">
+            <form  id="myform" class="layui-form"  onsubmit="return false ">
+            <div class="test-table-reload-btn" >
+              <div class="layui-inline">
+                <label class="layui-form-label">系统订单号</label>
+                <div class="layui-input-inline">
+                  <input class="layui-input" name="order_sn" placeholder="请输入系统订单号" autocomplete="off">
+                </div>
+              </div>
+
+              <div class="layui-inline">
+                <label class="layui-form-label">二维码编号</label>
+                <div class="layui-input-inline">
+                  <input class="layui-input" name="qr_id" placeholder="请输入二维码编号" autocomplete="off">
+                </div>
+              </div>
+
+              <div class="layui-inline">
+                <label class="layui-form-label">状态</label>
+                <div class="layui-input-inline">
+                  <select name="status" >
+                    <option value="">请选择</option>
+                    {% for keys , it in statusData%}
+                    <option value="{{keys}}">{{it.value}}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+              <div class="layui-inline">
+                <div class="layui-input-inline">
+                  <button id="search" class="layui-btn layuiadmin-btn-comm" data-type="reload" lay-submit="" lay-filter="LAY-app-contcomm-search">
+                  <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+                  </button>
+                </div>
+              </div>
+              
+            </div>
+            </form>
+          </div>
+       
+        </div>
+     
+    </div>
+
+     
+    <div class="layui-row">
+      <div class="layui-col-md12">
+        <div class="layui-card">
+          <div class="layui-card-body">
+           
+            <table class="layui-hide" id="table_src" lay-filter="test"></table>
+            {% verbatim %}
+            <script type="text/html" id="test-table-switchTpl">
+              <!-- 这里的 checked 的状态只是演示 -->
+              <input type="checkbox" lay-filter="test-table-status" name="status" lay-skin="switch" lay-text="正常|禁用" 
+               value="{{ d.status }}" data-json="{{ encodeURIComponent(JSON.stringify(d)) }}" {{ d.status == 1 ? 'checked' : '' }}>
+            </script>
+            {% endverbatim %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script type="text/html" id="role">
+    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+  </script>
+  <script src="{{layerStaticDomain}}/layui/layui.js"></script>
+  <script>
+    var _table = null; 
+    layui.config({
+      version: "{{version}}",
+      base: '{{layerStaticDomain}}/' //静态资源所在路径
+    }).extend({
+      index: 'lib/index' //主入口模块
+    }).use(['index', 'form', 'table'],function(){
+      var $ = layui.$
+      ,admin = layui.admin
+      ,element = layui.element
+      ,form = layui.form,
+      table = layui.table;
+      form.render(null, 'component-form-element');
+      table.render({
+        elem: '#table_src'
+        ,url:'/Collect_Order/index?inajax=1'
+        ,title: '订单'
+        ,toolbar: true
+        ,defaultToolbar:['filter']
+        ,cols: [[
+          {field:'qr_id', title:'二维码编号', width: 130, sort: true , align : 'center' },
+          {field:'order_sn', title:'平台订单号', width: 200, align : 'center'},
+          {field:'create_date', title:'创建时间', width: 180, sort: true, align : 'center'},
+          {field:'complete_date', title:'完成时间', width: 180, sort: true, align : 'center'},
+          {field:'money', title:'订单金额', width: 120, sort: true, align : 'center'},
+          {field:'address', title:'收款地址', width: 120,  align : 'center'},
+          {field:'status', title:'状态', width:120, align : 'center', templet: function(res){
+              if (res.status == '2') {
+                return '<button class="layui-btn layui-btn-xs layui-btn-normal">支付成功</button>';
+              } else if (res.status == '1'){
+                return '<button class="layui-btn layui-btn-warm layui-btn-xs"> 待支付</button>';
+              } else if (res.status == '3'){
+                return '<button class="layui-btn  layui-btn-xs layui-btn-danger layui-btn-normal">支付失败</button>';
+              }
+            }},
+          {field:'channel', title:'通道', align : 'center'},
+          //,{title:'操作', toolbar: '#role', minWidth:100, width:150}
+        ]]
+        ,id: 'tables_id'
+        ,page: true
+        ,limits: [10,20,30,40,50] // 每页展示条数
+        ,limit: {{pageSize}} // 每页默认显示的数量;注意：需要和后台首次传递过来的条数相同
+      });
+    //监听状态操作
+    /*form.on('switch(test-table-status)', function(obj){
+      var json = JSON.parse(decodeURIComponent($(this).data('json')));
+      layer.tips(this.value + ' ' + this.name + '：'+ obj.elem.checked, obj.othis);
+      json = table.clearCacheKey(json);
+      console.log(json); //当前行数据
+    });*/
+      // 操作功能
+      table.on('tool(test)', function(obj){
+        var data = obj.data;
+        if(obj.event === 'edit'){
+
+        }else if (obj.event === 'del'){
+
+        }
+      });
+      $('#search').click(function () {
+        search();
+      });
+      
+      $('#search_ipt').keydown(function (event) {
+        if (event.keyCode === 13) {
+          search();
+        }
+      });
+    
+      function search() {
+        var $where = getWhere();
+        table.reload('tables_id', {
+          page: {
+            curr: 1 //重新从第 1 页开始
+          }
+          ,where: $where
+        });
+      };
+      function getWhere(){
+        var _data = $("#myform").serializeArray()
+        var  o_data = {}
+        for( var i in _data ){
+          o_data[_data[i]['name']] = _data[i]['value']
+        }
+        return o_data
+      }
+
+  });
+  // 用于role_add或者role_edit页面调用;
+  function closeAndLoadData(){ 
+    layer.close(_table); // 销毁layer弹出层
+  }
+  
+  </script>
+</body>
+</html>

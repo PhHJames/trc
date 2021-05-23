@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>{{siteName}}--币添加</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet" href="{{layerCssPath}}?version={{version}}" media="all">
+  <link rel="stylesheet" href="{{layerStaticDomain}}/style/admin.css?version={{version}}" media="all">
+</head>
+<body>
+  <div class="layui-card-body layui-form">
+    <form id="myform" onsubmit="return false">
+        <div class="layui-form-item">
+            <label class="layui-form-label">币种：<span style="color: #FF5722;">*</span></label>
+            <div class="layui-input-inline">
+                <select name="c_name" >
+                    <option value="">请选择</option>
+                    {% for keys , it in allChannel%}
+                    <option value="{{it.channel}}">{{it.name}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="layui-form-mid layui-word-aux" ><b style="color:red;">选择类型</b></div>
+        </div>
+
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">币地址：<span style="color: #FF5722;">*</span></label>
+            <div class="layui-input-inline">
+              <input type="text" name="address" id="address" placeholder="" autocomplete="off" class="layui-input">
+            </div>
+            <div class="layui-form-mid layui-word-aux">
+                必须填写真实有效的币地址，否则不到账 ，币种和币地址必须是一一对应 ， 例如： TYMUAyb7rd7PPAEudn6GLBTc2eKcby2KCe</div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">名称：<span style="color: #FF5722;">*</span></label>
+            <div class="layui-input-inline">
+                <input type="text" name="name"  placeholder="" autocomplete="off" class="layui-input">
+            </div>
+            <div class="layui-form-mid layui-word-aux">填写名称方便区分</div>
+        </div>
+        <div class="layui-form-item box-center" style="text-align: center;">
+          <button class="layui-btn" id="submitBtn">提交</button>
+        </div>
+  </form>
+  </div>
+  <script src="{{layerStaticDomain}}/layui/layui.js"></script>
+  <script>
+      layui.config({
+        version: "{{version}}",
+        base: '{{layerStaticDomain}}/' //静态资源所在路径
+      }).extend({
+        index: 'lib/index' //主入口模块
+      }).use(['index', 'form'], function(){
+        var $ = layui.$
+        ,form = layui.form
+        ,element = layui.element;
+        // 表单数据提交
+        $('#submitBtn').click(function () {
+          var loading = null ;
+          $.ajax({
+            type:'POST',
+            url: '/Merch_Bank/add',
+            data: $('#myform').serializeArray(),
+            dataType: 'JSON',
+            success: function (res) {
+                layer.close(loading);
+                if( res['code'] != 1 ){
+                  layer.msg(res['msg'] , {icon : 5 } )
+                  return ;
+                }
+                layer.alert(res['msg'], {closeBtn : false }, function(){
+                    parent.window.location.reload();
+                });
+            },
+            beforeSend: function(){
+              loading = layer.load(0, {shade: [0.1,'#fff']})
+            },
+            error: function (){
+              layer.close(loading)
+              layer.msg("网络繁忙请稍后" , {icon : 5 } )
+            }
+          });
+        return false;
+        });
+});
+</script>
+</body>
+</html>

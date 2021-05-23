@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>{{siteName}}-修改基本信息</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet" href="{{layerCssPath}}?version={{version}}" media="all">
+  <link rel="stylesheet" href="{{layerStaticDomain}}/style/admin.css?version={{version}}" media="all">
+</head>
+<body>
+
+
+<div class="layui-card-body layui-form">
+  <form id="myform" onsubmit="return false">
+  <div class="layui-card">
+    <div class="layui-card-body">
+      <div class="layui-tab layui-tab-brief" lay-filter="component-tabs-hash">
+        <ul class="layui-tab-title">
+          <li class="layui-this" lay-id="11">基本信息</li>
+          <li lay-id="22" style="display: none;">收款设置</li>
+        </ul>
+        <div class="layui-tab-content">
+          <div class="layui-tab-item layui-show">
+            <div class="layui-form-item">
+              <label class="layui-form-label">appid</label>
+              <div class="layui-input-inline">
+                <input type="text" name="appid"  disabled value="{{info.appid}}" autocomplete="off" id="LAY_password" class="layui-input">
+              </div>
+              <div class="layui-form-mid layui-word-aux">不可修改</div>
+            </div>
+            <div class="layui-form-item">
+              <label class="layui-form-label">秘钥</label>
+              <div class="layui-input-block">
+                <input type="text" name="appsecret"  autocomplete="off" class="layui-input" placeholder="如果填写了那么代表修改系统会进行修改">
+              </div>
+              <div class="layui-form-mid layui-word-aux">32个英文字符 ，<a  style="color:red;" href="{{getu('Merch_user/makeSecret')}}" target="_blank">点击我在线生成</a></div>
+            </div>
+            <div class="layui-form-item">
+              <label class="layui-form-label">异步回调地址</label>
+              <div class="layui-input-block">
+                <input type="text" name="notify_url"  value="{{info.notify_url}}" autocomplete="off" class="layui-input ">
+              </div>
+              <div class="layui-form-mid layui-word-aux" ><code style="color:red;">请确保URL地址能访问（必须是公网的地址），不然无法进行回调 和 下单 ，注意第三方要返回一个 success 字符串(区分大小写) ， 不能有空格之类 或者其他的输出</code></div>
+            </div>
+            <div class="layui-form-item">
+              <label class="layui-form-label">补单异步回调地址</label>
+              <div class="layui-input-block">
+                <input type="text" name="supplement_url"  value="{{info.supplement_url}}" autocomplete="off" class="layui-input ">
+              </div>
+              <div class="layui-form-mid layui-word-aux" ><code style="color:red;">这个地址主要是用来进行补单 , 请确保URL地址能访问（必须是公网的地址），不然无法进行补单通知 ，注意第三方要返回一个 success 字符串(区分大小写) ， 不能有空格之类 或者其他的输出</code></div>
+            </div>
+
+            <div class="layui-form-item">
+              <label class="layui-form-label">白名单</label>
+              <div class="layui-input-block">
+                <textarea  class="layui-textarea" name="white_list_ip"  placeholder="一行一个">{{info['white_list_ip']}}</textarea>
+              </div>
+            </div>
+
+          </div>
+          <div class="layui-tab-item" style="display: none;">
+            <div class="layui-form-item">
+              <label class="layui-form-label">币种</label>
+              <div class="layui-input-block">
+                <input type="text" disabled   value="{{currency_name}}" autocomplete="off" class="layui-input ">
+              </div>
+            </div>
+
+            <div class="layui-form-item">
+              <label class="layui-form-label" style="color: blue">收款链名称</label>
+              <div class="layui-input-block">
+                <input type="text"  name="chain_name"   value="{{info.chain_name|default(channel_name)}}" autocomplete="off" class="layui-input ">
+              </div>
+            </div>
+
+            <div class="layui-form-item">
+              <label class="layui-form-label" style="color: blue">币地址</label>
+              <div class="layui-input-block">
+                <input type="text"  name="c_url"   value="{{info.c_url}}" placeholder="请仔细核对此地址 否则不到账" autocomplete="off" class="layui-input ">
+              </div>
+              <div class="layui-form-mid layui-word-aux" ><code style="color:red;">请仔细核对此地址 否则不到账</code></div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="layui-card-body">
+      <div class="layui-form-item">
+        <div class="layui-input-block">
+          <button class="layui-btn" id="submitBtn" lay-submit >确认修改</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </form>
+
+</div>
+
+
+
+  <script src="{{layerStaticDomain}}/layui/layui.js"></script>
+  <script>
+  layui.config({
+    version: "{{version}}",
+    base: '{{layerStaticDomain}}/' //静态资源所在路径
+  }).extend({
+    index: 'lib/index' //主入口模块
+  }).use(['index', 'form'] , function(){
+        var $ = layui.$
+        ,form = layui.form
+        ,element = layui.element;
+        $('#submitBtn').click(function () {
+          var loading = null ;
+          $.ajax({
+            type:'POST',
+            url: '{{getu("Merch_user/base")}}',
+            data: $('#myform').serializeArray(),
+            dataType: 'JSON',
+            success: function (res) {
+                layer.close(loading);
+                if( res['code'] != 1 ){
+                  layer.msg(res['msg'] , {icon : 5 } )
+                  return ;
+                }
+                layer.alert(res['msg'], {closeBtn : false   }, function(){
+                    parent.location.reload()
+                });
+            },
+            beforeSend: function(){
+              loading = layer.load(0, {shade: [0.1,'#fff']})
+            },
+            error: function (){
+              layer.close(loading)
+              layer.msg("网络繁忙请稍后" , {icon : 5 } )
+            }
+          });
+        })
+  });
+  </script>
+</body>
+</html>

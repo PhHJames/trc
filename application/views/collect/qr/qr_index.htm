@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>{{siteName}}-码商码管理</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet" href="{{layerCssPath}}?version={{version}}" media="all">
+  <link rel="stylesheet" href="{{layerStaticDomain}}/style/admin.css?version={{version}}" media="all">
+  <style>
+    .layui-table-cell {
+      height: 60px;
+      line-height: 60px;
+    }
+    th .layui-table-cell {
+      height: 30px;
+      line-height: 30px;
+    }
+    th .laytable-cell-1-0-7 {
+      height: 30px;
+      line-height: 30px;
+    }
+    .layui-table img {
+      width: 100px;
+      height: 60px;
+    }
+  </style>
+</head>
+<body>
+  <div class="layui-fluid">
+    <div class="layui-card">
+      <div class="layui-form layui-card-header layuiadmin-card-header-auto">
+          <div class="layui-card-body">
+            <form  id="myform" class="layui-form"  onsubmit="return false ">
+            <div class="test-table-reload-btn" >
+
+              <div class="layui-inline">
+                <label class="layui-form-label">编号</label>
+                <div class="layui-input-inline">
+                  <input class="layui-input" name="qr_id" placeholder="请编号查询" autocomplete="off">
+                </div>
+              </div>
+
+
+              <div class="layui-inline">
+                <label class="layui-form-label">币地址</label>
+                <div class="layui-input-inline">
+                  <input class="layui-input" name="content" placeholder="请输入币地址查询" autocomplete="off">
+                </div>
+              </div>
+              <div class="layui-inline">
+                <label class="layui-form-label">状态</label>
+                <div class="layui-input-inline">
+                  <select name="status" >
+                    <option value="99">请选择</option>
+                    {% for keys , it in statusData%}
+                    <option value="{{keys}}">{{it.value}}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+
+              <div class="layui-inline">
+                <label class="layui-form-label">自动匹配</label>
+                <div class="layui-input-inline">
+                  <select name="auto_match" >
+                    <option value="99">请选择</option>
+                    <option value="1">开启</option>
+                    <option value="0">关闭</option>
+                  </select>
+                </div>
+              </div>
+              <div class="layui-inline">
+                <div class="layui-input-inline">
+                  <button id="search" class="layui-btn layuiadmin-btn-comm" data-type="reload" lay-submit="" lay-filter="LAY-app-contcomm-search">
+                  <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+                  </button>
+                </div>
+              </div>
+              
+            </div>
+            </form>
+          </div>
+       
+        </div>
+     
+    </div>
+
+    <!--<div class="layui-card-body">
+      <blockquote class="layui-elem-quote layui-quote-nm" style="color: blue;">
+        总额 ￥{{statis.total_money}}，已支付 ￥{{statis.total_has_pay_money}}，剩余 ￥{{statis.total_shengyu_pay_money}}
+      </blockquote>
+
+    </div>-->
+
+    <div class="layui-card-body">
+      <div style="padding-bottom: 10px;">
+        <button class="layui-btn layui-btn-normal layui-btn-radius add" >添加币地址</button>
+
+      </div>
+
+    </div>
+
+     
+    <div class="layui-row">
+      <div class="layui-col-md12">
+        <div class="layui-card">
+          <div class="layui-card-body">
+           
+            <table class="layui-hide" id="table_src" lay-filter="test"></table>
+            {% verbatim %}
+            <script type="text/html" id="test-table-switchTpl">
+              <!-- 这里的 checked 的状态只是演示 -->
+              <input type="checkbox" lay-filter="test-table-status" name="status" lay-skin="switch" lay-text="正常|禁用" 
+               value="{{ d.status }}" data-json="{{ encodeURIComponent(JSON.stringify(d)) }}" {{ d.status == 1 ? 'checked' : '' }}>
+            </script>
+            <script type="text/html" id="show_img">
+              <a href="{{ d.path_pic }}" target="_blank"><img src="{{ d.path_pic }}" alt="" width="80" height="80"></a>
+            </script>
+
+
+            <script type="text/html" id="test-table-auto-match">
+              <!-- 这里的 checked 的状态只是演示 -->
+              <input type="checkbox" lay-filter="test-table-auto-match" name="auto_match" lay-skin="switch" lay-text="开启|关闭"
+                     value="{{ d.qr_id }}"  {{ d.auto_match == 1 ? 'checked' : '' }}>
+            </script>
+            {% endverbatim %}
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script type="text/html" id="role">
+    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+  </script>
+  <script src="{{layerStaticDomain}}/layui/layui.js"></script>
+  <script>
+    var _table = null; 
+    layui.config({
+      version: "{{version}}",
+      base: '{{layerStaticDomain}}/' //静态资源所在路径
+    }).extend({
+      index: 'lib/index' //主入口模块
+    }).use(['index', 'form', 'table', 'upload'],function(){
+      var $ = layui.$
+      ,admin = layui.admin
+      ,element = layui.element
+      ,form = layui.form
+      ,upload = layui.upload,
+      table = layui.table;
+      form.render(null, 'component-form-element');
+      upload.render({ //允许上传的文件后缀
+        elem: '#test-upload-size'
+        ,url: '/Collect_Qr/beatchUpload'
+        ,accept: 'file' //普通文件
+        ,exts: 'xls|csv'
+        ,done: function(res){
+          if( res.code != 1 ){
+            layer.msg(res.msg);
+            return ;
+          }
+          layer.alert( res.msg , {closeBtn : false } )
+        }
+      });
+      table.render({
+        elem: '#table_src'
+        ,url:'/Collect_Qr/index?inajax=1'
+        ,title: '二维码'
+        ,toolbar: true
+        ,defaultToolbar:['filter']
+        ,cols: [[
+          {field:'qr_id', title:'编号', align : 'center'},
+          {field:'chain_name', title:'链名称', align : 'center'},
+          {field:'content', title:'币地址', align : 'center'},
+          { title:'二维码图片',  templet : '#show_img', align : 'center' },
+          {field:'create_time', title:'创建时间', sort: true, align : 'center'},
+          {field:'status_string', title:'状态',  align : 'center'},
+          {field:'success_money', title:'累计成功金额', align : 'center'},
+          {field:'error_money', title:'累计失败金额', align : 'center'},
+          {field:'remark', title:'备注', align : 'center'},
+          {field:'match_index', title:'权重', align : 'center'},
+          {field:'auto_match', title:'自动匹配',templet: '#test-table-auto-match'},
+          //,{title:'操作', toolbar: '#role', minWidth:100, width:150}
+        ]]
+        ,id: 'tables_id'
+        ,page: true
+        ,limits: [10,20,30,40,50] // 每页展示条数
+        ,limit: {{pageSize}} // 每页默认显示的数量;注意：需要和后台首次传递过来的条数相同
+      });
+    //监听状态操作
+    /*form.on('switch(test-table-status)', function(obj){
+      var json = JSON.parse(decodeURIComponent($(this).data('json')));
+      layer.tips(this.value + ' ' + this.name + '：'+ obj.elem.checked, obj.othis);
+      json = table.clearCacheKey(json);
+      console.log(json); //当前行数据
+    });*/
+      // 操作功能
+      table.on('tool(test)', function(obj){
+        var data = obj.data;
+        if(obj.event === 'edit'){
+
+        }else if (obj.event === 'del'){
+
+        }
+      });
+      $('#search').click(function () {
+        search();
+      });
+      
+      $('#search_ipt').keydown(function (event) {
+        if (event.keyCode === 13) {
+          search();
+        }
+      });
+    
+      function search() {
+        var $where = getWhere();
+        table.reload('tables_id', {
+          page: {
+            curr: 1 //重新从第 1 页开始
+          }
+          ,where: $where
+        });
+      };
+      function getWhere(){
+        var _data = $("#myform").serializeArray()
+        var  o_data = {}
+        for( var i in _data ){
+          o_data[_data[i]['name']] = _data[i]['value']
+        }
+        return o_data
+      }
+    $(".add").click(function () {
+      addQr()
+    })
+      function addQr(){
+        var title = '添加币地址',
+                _url = "/Collect_Qr/add", // 权限数据请求地址
+                flag = true; // 用于判断关闭按钮触发还是数据提交触发
+        var area = ['80%', '80%']
+        _table = layer.open({
+          type: 2
+          ,title: title // 标题
+          ,content: _url  // url
+          ,maxmin: true // 是否可以全屏
+          ,area: area // 弹出层的宽/高
+          ,end: function () { // 页面销毁后执行
+            if (flag) { // 数据提交触发
+              var $where = getWhere();
+              table.reload('tables_id', {
+                where: $where
+              });
+            }
+          }
+          ,cancel: function () { // 右上角关闭按钮触发的回调
+            flag = false;
+          }
+        });
+      }
+      form.on('switch', function (data) {
+        var onShow = data.elem.checked ? 1 : 0 ;
+        if(data.elem.name == 'auto_match' ){
+          auto_match( data.value , onShow )
+        }
+        //changeTableVal('hospital', 'hid', data.value, data.elem.name, onShow);
+      })
+
+      function auto_match(qr_id , auto_match){
+        var loading = null ;
+        $.ajax({
+          type:'POST',
+          url: '{{getu("Collect_Qr/auto_match")}}',
+          data: {qr_id : qr_id ,auto_match : auto_match } ,
+          dataType: 'JSON',
+          success: function (res) {
+            layer.close(loading);
+            if( res['code'] != 1 ){
+              layer.msg(res['msg'] , {icon : 5 } )
+              return ;
+            }
+            table.reload('tables_id', {
+              page: {
+                curr: 1 //重新从第 1 页开始
+              }
+              ,where: getWhere()
+            });
+          },
+          beforeSend: function(){
+            loading = layer.load(0, {shade: [0.1,'#fff']})
+          },
+          error: function (){
+            layer.close(loading)
+            layer.msg("网络繁忙请稍后" , {icon : 5 } )
+          }
+        });
+      }
+
+
+  });
+  // 用于role_add或者role_edit页面调用;
+  function closeAndLoadData(){ 
+    layer.close(_table); // 销毁layer弹出层
+  }
+  
+  </script>
+</body>
+</html>

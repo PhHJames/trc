@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>{{siteName}}-代理商登录</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet" href="{{layerCssPath}}" media="all">
+  <link rel="stylesheet" href="{{layerStaticDomain}}/style/admin.css" media="all">
+  <link rel="stylesheet" href="{{layerStaticDomain}}/style/login.css" media="all">
+</head>
+<body style="background-color: #5FB878">
+
+  <div class="layadmin-user-login layadmin-user-display-show" id="LAY-user-login" style="display: none;">
+
+    <div class="layadmin-user-login-main">
+      <div class="layadmin-user-login-box layadmin-user-login-header">
+        <h2>{{siteName}}代理商系统 </h2>
+        <p>{{siteName}} 代理商系统</p>
+      </div>
+      <div class="layadmin-user-login-box layadmin-user-login-body layui-form">
+        <form onsubmit="return false" id="myform" action="/Agent_Login/index" method="POST" autocomplete="off">
+        <div class="layui-form-item">
+          <label class="layadmin-user-login-icon layui-icon layui-icon-username" for="LAY-user-login-username"></label>
+          <input type="text" name="account" id="LAY-user-login-username" lay-verify="required" placeholder="账号" class="layui-input" autocomplete="off">
+        </div>
+        <div class="layui-form-item">
+          <label class="layadmin-user-login-icon layui-icon layui-icon-password" for="LAY-user-login-password"></label>
+          <input type="password" name="password" id="LAY-user-login-password" lay-verify="required" placeholder="密码 6-16" class="layui-input">
+        </div>
+        <!--
+        <div class="layui-form-item" style="display:none">
+          <div class="layui-row">
+            <div class="layui-col-xs7">
+              <label class="layadmin-user-login-icon layui-icon layui-icon-vercode" for="LAY-user-login-vercode"></label>
+              <input type="text" name="vercode" id="LAY-user-login-vercode" lay-verify="required" placeholder="图形验证码" class="layui-input">
+            </div>
+            <div class="layui-col-xs5">
+              <div style="margin-left: 10px;">
+                <img src="https://www.oschina.net/action/user/captcha" class="layadmin-user-login-codeimg" id="LAY-user-get-vercode">
+              </div>
+            </div>
+          </div>
+        </div>
+        -->
+        <div class="layui-form-item" style="margin-bottom: 20px;">
+          <input type="checkbox" checked="" name="remember" lay-skin="primary" title="记住密码">
+         
+        </div>
+        <div class="layui-form-item">
+          <button class="layui-btn layui-btn-fluid"  id="login">登 入</button>
+        </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="{{layerStaticDomain}}/layui/layui.js"></script>
+  <script>
+  var loading  ;
+  layui.config({
+    base: '{{layerStaticDomain}}/' //静态资源所在路径
+  }).extend({
+    index: 'lib/index' //主入口模块
+  }).use(['index'], function(){
+    var $ = layui.$,
+    admin = layui.admin
+    $("#LAY-user-login-username").val('')
+    $("#LAY-user-login-password").val('')
+    //layer.load(0, {shade: [0.1,'#fff']})
+    $("#login").click( function(){
+      var _data = $("#myform").serializeArray();
+      var url = $("#myform").attr("action");
+      var username = $("#LAY-user-login-username").val()
+      var password = $("#LAY-user-login-password").val()
+      
+      if(username == '' ){
+          layer.msg('请输入账号', {icon: 2});
+          return false ;
+      }
+      if(password == '' ){
+          layer.msg('请输入密码', {icon: 2});
+          return false ;
+      }
+      var _data = {
+        'account' : username ,
+        'password' : password
+      }
+      
+      $.ajax({
+          url: url,
+          type: 'POST',
+          data: _data,
+          dataType : "json" ,
+          success: function(res){
+            layer.close(loading)
+            if( res['code'] != 1 ){
+              layer.msg(res['msg'] , {icon : 5 } )
+              return ;
+            }
+            layer.msg('登入成功', {
+            icon: 1
+            ,time: 1000,
+            shade: 1
+            }, function(){
+              location.href = "/Agent_index/index"; //后台主页
+            });
+            
+          },
+          beforeSend: function(){
+              loading = layer.load(0, {shade: [0.1,'#fff']})
+          },
+          error : function (){
+              layer.close(loading)
+              layer.msg("网络繁忙请稍后" , {icon : 5 } )
+          }
+      })
+
+      /*admin.req({
+        url:url 
+        ,data: _data,
+        method : "POST"
+        ,done: function(res){
+          if( res['code'] != 1 ){
+              layer.msg(res['msg'] , {icon : 5 } )
+              return ;
+          }
+          console.log(res)
+          //登入成功的提示与跳转
+          layer.msg('登入成功', {
+            icon: 1
+            ,time: 1000
+          }, function(){
+            location.href = "/"; //后台主页
+          });
+        },
+        success:function(){
+          alert(222)
+      }
+      });*/
+      
+    })
+});
+
+ 
+
+
+</script>
+</body>
+</html>

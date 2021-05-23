@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>{{siteName}}--查看币</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet" href="{{layerCssPath}}?version={{version}}" media="all">
+  <link rel="stylesheet" href="{{layerStaticDomain}}/style/admin.css?version={{version}}" media="all">
+</head>
+<body>
+  <div class="layui-card-body layui-form">
+      <div class="layui-card">
+          <div class="layui-card-body layui-text">
+              <table class="layui-table">
+                  <colgroup>
+                      <col width="200">
+                      <col>
+                  </colgroup>
+                  <tbody>
+                  <tr>
+                      <td>编号</td>
+                      <td>
+                          {{info['qr_id']}}
+                      </td>
+                  </tr>
+                  <tr>
+                      <td>链名称</td>
+                      <td>
+                          {{info['chain_name']}}
+                      </td>
+                  </tr>
+                  <tr>
+                      <td>币地址</td>
+                      <td>
+                          {{info['content']}}
+                      </td>
+                  </tr>
+                  <tr>
+                      <td>图片</td>
+                      <td><img src="{{info['path_pic']}}"></td>
+                  </tr>
+
+                  <tr>
+                      <td>备注</td>
+                      <td>
+                          {{info['remark']}}
+                      </td>
+                  </tr>
+
+                  <!--<tr>
+                      <td>交易id</td>
+                      <td>
+                          {{info['txid']}}
+                          <a href="https://tronscan.io/#/transaction/{{info['txid']}}" target="_blank">点我查询,国内访问速度慢</a>
+                      </td>
+                  </tr>-->
+
+                  <!--<tr>
+                      <td>私钥</td>
+                      <td>
+                          <button class="layui-btn layui-btn-normal layui-btn-radius updatePrivate">点我去查看更新</button>
+                          <span style="color:red">私钥一定要妥善的保管,请使用本子记下来</span>
+                          
+                          <div>
+                              <textarea name="" id="private_key"  class="layui-textarea"></textarea>
+                          </div>
+                      </td>
+                  </tr>-->
+
+
+                  <tr>
+                      <td>余额查询</td>
+                      <td>
+                          <button class="layui-btn  get_balance">点我去查看余额</button>
+                          <div id="show_balance" style="margin-top:10px;color: #3c763d;font-size: 20px;font-weight: bold ;">
+                              <!--<textarea name=""  id="get_balance" class="layui-textarea"></textarea>-->
+                          </div>
+                      </td>
+                  </tr>
+                  </tbody>
+              </table>
+          </div>
+      </div>
+
+  </div>
+  <script src="{{layerStaticDomain}}/layui/layui.js"></script>  
+  <script>
+      layui.config({
+        version: "{{version}}",
+        base: '{{layerStaticDomain}}/' //静态资源所在路径
+      }).extend({
+        index: 'lib/index' //主入口模块
+      }).use(['index', 'form'], function(){
+        var $ = layui.$
+        ,form = layui.form
+        ,element = layui.element;
+        // 表单数据提交
+          $(".updatePrivate").click(function () {
+              updatePrivate("{{info.qr_id}}")
+          })
+          $(".get_balance").click(function () {
+              get_balance("{{info.qr_id}}")
+          })
+
+          function updatePrivate( qr_id ) {
+              $.ajax({
+                  type:'POST',
+                  url: '{{getu("Admin_Collectqrcode/updatePrivate")}}',
+                  data:  {qr_id : qr_id } ,
+                  dataType: 'JSON',
+                  success: function (res) {
+                      layer.close(loading);
+                      if( res['code'] != 1 ){
+                          layer.msg(res['msg'] , {icon : 5 } )
+                          return ;
+                      }
+
+                      $("#private_key").val( res.data.privatekey )
+                      /*layer.alert(res['msg'], { closeBtn : false }, function(){
+                          location.reload()
+                      });*/
+                  },
+                  beforeSend: function(){
+                      loading = layer.load(0, {shade: [0.1,'#fff']})
+                  },
+                  error: function (){
+                      layer.close(loading)
+                      layer.msg("网络繁忙请稍后" , {icon : 5 } )
+                  }
+              });
+          }
+
+          function get_balance(qr_id) {
+              $.ajax({
+                  type:'POST',
+                  url: '{{getu("Admin_Collectqrcode/get_balance")}}',
+                  data:  {qr_id : qr_id } ,
+                  dataType: 'JSON',
+                  success: function (res) {
+                      layer.close(loading);
+                      if( res['code'] != 1 ){
+                          layer.msg(res['msg'] , {icon : 5 } )
+                          return ;
+                      }
+                      var data = res.data
+
+
+                      //var str = JSON.stringify(data)
+
+                      var str = JSON.stringify(data, null, 4);
+
+                      $("#get_balance").val( str )
+                      $("#show_balance").html("<pre>"+str+"</pre>")
+                      //$("#private_key").val( res.data.privatekey )
+                      /*layer.alert(res['msg'], { closeBtn : false }, function(){
+                          location.reload()
+                      });*/
+                  },
+                  beforeSend: function(){
+                      loading = layer.load(0, {shade: [0.1,'#fff']})
+                  },
+                  error: function (){
+                      layer.close(loading)
+                      layer.msg("网络繁忙请稍后" , {icon : 5 } )
+                  }
+              });
+          }
+});
+</script>
+</body>
+</html>

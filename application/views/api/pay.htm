@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{{currency_name}}充值</title>
+    <link href="{{layerStaticDomain}}/static/css/jquery.modal.css" rel="stylesheet">
+    {% verbatim %}
+    <style>
+        *{box-sizing:border-box;padding:0;margin:0;-webkit-font-smoothing:antialiased;color:#333}*:focus{outline:none;-webkit-tap-highlight-color:transparent}html,body{background:#eee}@media (max-width: 540px){html,body{background:white}}#app{max-width:540px;margin:0 auto;padding:15px;background:#fff;margin-top:30px}@media (max-width: 540px){#app{min-height:100vh;margin-top:0}}@media (max-width: 350px){#app{zoom:.85}}#app .content{padding:15px;border-radius:5px}@media (max-width: 540px){#app .content{box-shadow:0 0 3px 4px rgba(0,0,0,0.08)}}#app .content .main .price h2,#app .content .main .price h3{text-align:center;margin-bottom:10px}#app .content .main .qrcode{padding-bottom:20px}#app .content .main .qrcode img{width:220px;height:220px;display:block;background:#ccc;margin:0 auto}#app .content .main .address{border-top:1px solid #eee;padding:15px 0;position:relative}#app .content .main .address *{text-align:center}#app .content .main .address:before{display:inline-block;position:absolute;left:50%;top:0;transform:translate(-50%, -50%);overflow:hidden;background:white;padding:0 4px;content:"充值地址"}#app .content .main .address p{word-break:break-all;font-weight:600;margin:15px 0}#app .content .main .address .copy{color:#409eff}#app .content .notice h4{color:#666;margin-bottom:5px}#app .content .notice p{font-size:14px;color:#888}.icon-copy{display:inline-block;width:16px;height:16px;background:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAMAAAANIilAAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyNpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNS1jMDE0IDc5LjE1MTQ4MSwgMjAxMy8wMy8xMy0xMjowOToxNSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIChNYWNpbnRvc2gpIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjAzODI4Njc5RkQ0NDExRTk4NTU0QjYwMDREMjIyQzRCIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjAzODI4NjdBRkQ0NDExRTk4NTU0QjYwMDREMjIyQzRCIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6MDM4Mjg2NzdGRDQ0MTFFOTg1NTRCNjAwNEQyMjJDNEIiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6MDM4Mjg2NzhGRDQ0MTFFOTg1NTRCNjAwNEQyMjJDNEIiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz7sYEzlAAAAvVBMVEVrp+RFmvFAnv7d6fVsp+RGmvFZnuhJmu+60+ygw+i/1u1BnPpAm/hAnf3y9vtAnPtImu/8/f5FmvNdoeZNm+zg6/Z4reSHteTm6/H6+/zB1+9an+f1+fxDmvZppuVGmvBopeXY5vRtqORMm+zV4/JLm+13rOXi6/TJ1eJKi9A/nPx/o8lHme9Am/k/nf2DpMioyOnd5/JHiMtHiM1Ikd9Al/BFmvLv9Prm7fO10OxAnf7T4vNAnPxAnv////8hZBjiAAAAP3RSTlP//////////////////////////////////////////////////////////////////////////////////wCOJnwXAAABWUlEQVR42uzX127DMAwFUO8ZxyO72bN7Ty/9/2eltYoERUmZrp9S+D5aOoAAkxoSg6OmgmzOR8UkCZLvu8jNRLl9uR4iWL3JS3P3fAHicJ1T8jSEsK2Q8NU9hI2clssRgE0+luDhS3v9ALBcDBlOjMUaFNp/RLHG8FjJ14xsg2JJgGOO0wafMtYr4dA2TPkQ3auC1TXUgzTcDsCGo+FdXgNHNbDq1sBpxntfk76jtarixDkOzSvj+E8V1uCTxysBdnDMdxJzJWHR+DkK4i3xiHV7AF4QccQAfJbRcB/CbEayQRvE4cwrpUpXZSD+XPliqx/24jnfHbzjF9kc28UlDsQ/oxVY/z1AwVKB5Qb/A2yVFgmOlYGF3lMdA8VLnxe64IbMW8EE8GRK7P0xgFmHZhUbwmmLhLvQb2DsgaIDFcYs7Ux94RvMfeu3GYIZmyxFr7+0hxTAXoABAI1iKm50u4O9AAAAAElFTkSuQmCC") no-repeat;background-size:cover;position:relative;top:1px}.alertMessage{pointer-events:none;cursor:default;position:fixed;width:100vw;height:100vh;z-index:10000;top:0;left:0;display:flex;align-items:center;justify-content:center}.alertMessage .content{padding:.3rem .4rem;border-radius:.106667rem;z-index:10001;display:block;background:rgba(0,0,0,0.7);color:white}.hide{display:none}#modal{max-width:360px;padding:15px 20px;border-radius:4px;position:relative;vertical-align:unset}#modal h3{font-weight:400;text-align:center;margin-bottom:20px}#modal p{margin-top:15px}#modal span{color:red;font-size:bold}#modal button{cursor:pointer;margin:0 auto;background-color:#108ee9;color:white;width:100%;border:none;height:40px;margin-top:15px;border-radius:6px}.close-modal{display:none !important}
+
+    </style>
+    {% endverbatim %}
+</head>
+<body>
+<div id="app">
+    <div class="content">
+        <div class="main">
+            <div class="price">
+                <h2>充值金额: ￥{{info.r_money}}</h2>
+                <h3>剩余时间: <span id="lastTime" style="color:red;"></span></h3>
+                <h3>请转入 <span class="usdtPrice" style="color:red;">{{info.money}}</span> {{info.channel_name}}
+                    <small style="color:#999;font-size:12px;">(不含手续费)</small>
+                </h3>
+                <h3>
+                    <span id="usdtcp" class="icon-copy cpBtn" data-clipboard-text="{{info.money}}"></span>
+                    <small >(复制金额)</small>
+                </h3>
+            </div>
+            <div class="qrcode">
+                <img src="{{qr_pic}}" alt="">
+            </div>
+            <div class="address">
+                <p>{{qr_info.content}}</p>
+                <div class="cpBtn" data-clipboard-text="{{qr_info.content}}"><span class="icon-copy"></span> 复制地址</div>
+            </div>
+        </div>
+        <div class="notice">
+            <h4>*注意</h4>
+            <p>1. 请勿向上述地址支付任何非 <span style="font-size:18px;font-weight: bold;">{{info.channel_name}}</span> 资产，否则资产将无法找回。后果自负。</p>
+            <p>2. 请确保收款地址收到 <span style="color:red; font-size: 18px">{{info.money}}</span> {{info.channel_name}}<span style="color:red; font-weight: bolder">「不含转账手续费」</span>, 否则无法到账。</p>
+            <p>3. 您支付至上述地址后，需要整个网络节点的确认，请耐心等待。</p>
+        </div>
+    </div>
+</div>
+
+<div class="alertMessage hide">
+    <div class="content"></div>
+</div>
+
+</body>
+<script src="{{layerStaticDomain}}/static/js/jquery.min.js"></script>
+<script src="{{layerStaticDomain}}/static/js/jquery.modal.min.js"></script>
+<script src="{{layerStaticDomain}}/static/js/clipboard.min.js"></script>
+<script>
+    (function () {
+        var clipboard = new ClipboardJS('.cpBtn');
+        clipboard.on('success', function (e) {
+            alertMessage('复制成功!')
+            if (typeof _maq !== "undefined") _maq.trigger(["_trackEvent", "gatewayCopy", e.text, "AA202101132100162924609706"])
+        });
+        clipboard.on('error', function (e) {
+            alertMessage('复制失败，请手动复制!')
+        });
+
+        $("#closeModal").on('click', function () {
+            $.modal.close()
+        })
+
+        function alertMessage(text, dur) {
+            $(".alertMessage .content").text(text)
+            $(".alertMessage").removeClass("hide")
+            setTimeout(function () {
+                $(".alertMessage").addClass("hide")
+            }, dur ? dur : 2000)
+        }
+    })()
+    var maxtime = "{{maxtime}}";
+    m = Math.floor(maxtime / 60)
+    m = m > 9 ? m : "0" + m
+    s = (maxtime % 60)
+    s = s > 9 ? s : "0" + s
+    document.all["lastTime"].innerHTML = m + ":" + s;
+    timer = setInterval("count()", 1000);
+
+    function count() {
+        if (maxtime >= 0) {
+            var minutes = Math.floor(maxtime / 60);
+            minutes = minutes > 9 ? minutes : "0" + minutes
+            var seconds = Math.floor(maxtime % 60) >= 10 ? Math.floor(maxtime % 60) : '0' + Math.floor(maxtime % 60);
+            var msg = minutes + ":" + seconds;
+            $("#lastTime").text(msg)
+            --maxtime;
+        } else {
+            clearInterval(timer);
+            $(".qrcode").hide()
+            $("#lastTime").text("已过期")
+            $(".address").hide()
+
+            setTimeout(function () {
+
+            }, 1000)
+        }
+    }
+    var intervalOrderInfo = setInterval(function () {
+        $.post("/Api_pay/query", {
+            order_sn: "{{info.order_sn}}"
+        }, function (response) {
+            var data = response;
+            //console.log(data)
+            var status = data.data.status
+            if (status == 2 ) {
+                clearInterval(intervalOrderInfo);
+                $("body").html("<h1><center style='color:green;'>付款成功</center></h1>")
+                //location.reload()
+            } else{
+                if( status != 1 ){
+                    clearInterval(intervalOrderInfo);
+                    $("body").html("<h1><center>订单异常，请刷新页面</center></h1>")
+                }
+            }
+        }, "json");
+    }, 1000);
+</script>
+
+</html>

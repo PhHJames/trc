@@ -1,0 +1,179 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+.tbodyPayBox {
+ /*  width: 270px; */
+  width: 50%;
+  margin: 0 auto;
+  box-shadow: 0px 0px 29.8px rgba(0, 0, 0, 0.3);
+  background: #fff;
+  text-align: center;
+  margin-top: 10px;
+  border-radius: 10px;
+  padding-bottom: 5px;
+}
+
+.payNum {
+  font-size: 35px;
+  font-weight: 500;
+  color: #e10606;
+  padding: 15px 0 5px 0;
+}
+
+.payCode {
+  width: 85%;
+  margin-top: 20px;
+}
+
+.paragraph {
+  width: 100%;
+  font-size: 16px;
+  color: #333;
+  line-height: 25px;
+  text-align: center;
+  margin-top: 30px;
+}
+
+.Line {
+  width: 90%;
+  background: #aeb3c0;
+  height: 2.384px;
+  border-radius: 2px;
+  margin: 0 auto;
+  margin-top: 10px;
+}
+
+.payTips {
+  width: 100%;
+  margin: 10px 0 0 0;
+  padding-bottom: 10px;
+}
+
+.payTips p {
+  font-size: 14px;
+  color: #333333;
+  line-height: 25px;
+}
+
+.clockImg {
+  width: 20px;
+  vertical-align: middle;
+  margin-right: 5px;
+}
+
+.payBox .service {
+  width: 24px;
+}
+
+/* second */
+
+
+.head {
+  background: rgba(225, 225, 225, 0.4);
+  border: 1px solid #eee;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 90%;
+  margin: 15px auto 20px;
+  border-radius: 10px;
+}
+.head span:first-child {
+  font-size: 48px;
+  color: #333;
+  font-weight: 600;
+}
+.head span:last-child {
+  font-size: 30px;
+  font-weight: 600;
+  color: red;
+}
+.order {
+  text-align: center;
+  font-size: 16px;
+  width: 90%;
+  margin: 0 auto;
+}
+.expiration {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.orderNumber {
+  margin-top: 10px;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 20px;
+}
+.transfer {
+  margin: 5px auto 0;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 15px;
+}
+.recommend {
+  display: flex;
+  align-items: center;
+}
+.numIcon {
+  width: 16px;
+  height: 16px;
+}
+.recommend span {
+  color: #FF5A25;
+  font-size: 14px;
+  font-weight: 600;
+  padding-left: 5px;
+}
+.account {
+  font-size: 16px;
+  color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+.copyText {
+  color: #000;
+  font-size: 16px;
+  font-weight: 600;
+}
+.username {
+  margin-top: 5px;
+  color: #333;
+}
+.tips {
+  color: #FF3398;
+  font-size: 14px;
+  margin-top: 10px;
+}
+.tbodyBox {
+  width: 90%;
+  margin: 0 auto;
+}
+.codeTips {
+  display: flex;
+  align-items: center;
+}
+.codeTips span {
+  padding-left: 5px;
+  font-size: 14px;
+}
+.scanCode {
+  margin-top: 5px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.tbodyContent .textDesc {
+  text-align: center;
+  color: #666;
+  margin-top: 10px;
+}
+.textWarning {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.textWarning span {
+  color: #FF6A21;
+  padding-left: 5px;
+}

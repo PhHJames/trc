@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{{siteName}}-代理商行为日志</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="{{layerCssPath}}?version={{version}}" media="all">
+    <link rel="stylesheet" href="{{layerStaticDomain}}/style/admin.css?version={{version}}" media="all">
+</head>
+<body>
+<div class="layui-fluid">
+    <blockquote class="layui-elem-quote layui-quote-nm">
+        代理商行为日志
+        <br>——代理商行为日志 ， 可以查看代理商操作的数据
+    </blockquote>
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto">
+            <div class="layui-card-body">
+                <form  id="myform" class="layui-form"  onsubmit="return false ">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">代理商登录账号</label>
+                        <div class="layui-input-inline">
+                            <input class="layui-input" name="username" placeholder="请输入代理商登录账号"  autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">执行URL</label>
+                        <div class="layui-input-inline">
+                            <input class="layui-input" name="url" placeholder="请输入执行URL"  autocomplete="off">
+                        </div>
+                    </div>
+
+                    <div class="layui-inline">
+                        <label class="layui-form-label">请求方式</label>
+                        <div class="layui-input-inline">
+                            <select name="method"  class="layui-select">
+                                <option value="">请选择</option>
+                                <option value="GET">get请求</option>
+                                <option value="POST">post请求</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <div class="layui-input-inline">
+                            <button id="search" class="layui-btn layuiadmin-btn-comm" data-type="reload" lay-submit="" lay-filter="LAY-app-contcomm-search">
+                                <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="layui-row">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-body">
+                    <table class="layui-hide" id="table_src" lay-filter="test"></table>
+                    <script type="text/html" id="test-table-operate-barDemo">
+                        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看具体数据</a>
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="{{layerStaticDomain}}/layui/layui.js"></script>
+    <script>
+        var _table = null;
+        layui.config({
+            version: "{{version}}",
+            base: '{{layerStaticDomain}}/' //静态资源所在路径
+        }).extend({
+            index: 'lib/index' //主入口模块
+        }).use(['index', 'form', 'table'],function(){
+            var $ = layui.$
+                ,admin = layui.admin
+                ,element = layui.element
+                ,form = layui.form,
+                table = layui.table;
+
+            form.render(null, 'component-form-element');
+            table.render({
+                elem: '#table_src'
+                ,url:'{{getu("Admin_Agentlog/index" , "inajax=1")}}'
+                ,title: '平台日志'
+                ,toolbar: true
+                ,defaultToolbar:['filter']
+                ,cols: [[
+                    //{field:'id', title:'编号', width:100, minWidth: 60, sort: true},
+                    {field:'agent_id', title:'代理商ID', width:180},
+                    {field:'username', title:'账号', width:180},
+                    {field:'url', title:'执行URL'},
+                    {field:'create_time', title:'操作时间', minWidth: 150, sort: true},
+                    {field:'method', title:'请求方式', minWidth:80},
+                    ,{width:100, align:'center', fixed: 'right', toolbar: '#test-table-operate-barDemo'}
+                ]]
+                ,id: 'tables_id'
+                ,page: true
+                ,limits: [100 , 150 , 200 ] // 每页展示条数
+                ,limit: {{pageSize}} // 每页默认显示的数量;注意：需要和后台首次传递过来的条数相同
+        });
+
+            //监听工具条
+            table.on('tool(test)', function(obj){
+                var data = obj.data;
+                console.log(data.request)
+                if(obj.event === 'detail'){
+                    layer.alert(data.request, {
+                        skin: 'layui-layer-molv'
+                        ,closeBtn: 0
+                    });
+                }
+            });
+            $('#search').click(function () {
+                search();
+            });
+            $('#search_ipt').keydown(function (event) {
+                if (event.keyCode === 13) {
+                    search();
+                }
+            });
+
+            function search() {
+                var $where = getWhere();
+                table.reload('tables_id', {
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                    ,where: $where
+                });
+            };
+            function getWhere(){
+                var _data = $("#myform").serializeArray()
+                var  o_data = {}
+                for( var i in _data ){
+                    o_data[_data[i]['name']] = _data[i]['value']
+                }
+                return o_data
+            }
+
+
+        });
+        // 用于role_add或者role_edit页面调用;
+        function closeAndLoadData(){
+            layer.close(_table); // 销毁layer弹出层
+        }
+
+    </script>
+</body>
+</html>

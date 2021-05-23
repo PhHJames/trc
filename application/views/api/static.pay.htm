@@ -1,0 +1,252 @@
+<html>
+ <head> 
+  <meta charset="utf-8" /> 
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" /> 
+  <title>支付收银台</title> 
+  <meta property="og:title" content="支付收银台" /> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" /> 
+  <link rel="stylesheet" media="screen" href="{{layerStaticDomain}}/static/pay_template_2/index.css?v=2" /> 
+  <script type="text/javascript" src="{{layerStaticDomain}}/static/pay_template_2/jquery-1.12.3.js">
+    
+</script> 
+  <script type="text/javascript" src="{{layerStaticDomain}}/static/pay_template_2/clipboard.min.js"></script> 
+  <script type="text/javascript" src="{{layerStaticDomain}}/static/pay_template_2/qrcode.min.js"></script> 
+ </head> 
+ <body class="order-layout"> 
+  <div class="guest-payment-order-form">
+   <div>
+    <header>
+     <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container-fluid">
+       <div class="navbar-header text-center">
+        <a href="#" class="navbar-brand">收银台</a>
+       </div>
+      </div>
+     </nav>
+    </header>
+    <div role="main" class="mobile-container">
+     <div class="order-panel">
+      <div>
+       <div class="payment-method-selection">
+        <div class="payment-guide"></div>
+        <div class="payment-box">
+         <div class="box-header">
+          <div class="order-id">
+           <strong style="font-size:16px;color:#e74c3c;text-align:center">详细视频教程已更新，请耐心观看如何兑换USDT，谢谢！</strong>
+           <br />
+           <div id="address">
+            地址：{{qr_info.content}}
+            <br />
+           </div>
+           <button type="button" id="copy" data-clipboard-text="{{qr_info.content}}" class="btn btn-xs btn-default copy-btn">复制地址</button>
+           <input type="hidden" id="time_exist" value="{{maxtime}}">
+          </div>
+         </div>
+         <div class="box-body">
+          <div class="total-amount">
+           <strong class="text-danger">{{info.money}}U</strong>
+           <br />
+           <button type="button" id="copy2" data-clipboard-text="{{info.money}}" class="btn btn-xs btn-default copy-btn">复制金额</button>
+          </div>
+          <div class="clearfix">
+           <!--<div class="select-intro" style="color:#e74c3c;font-size:20px"><strong>火币提币已开始收手续费，请多转1U！</strong></div>-->
+           <div class="select-intro" style="color:#e74c3c">
+             请选择
+            <strong style="font-size:16px;color:#000">USDT-TRC20</strong>转账，金额错误、订单超时、重复支付会无法到账
+            <br />
+           </div>
+           <ul class="payment-method-list">
+            <div>
+             <div style="margin:0 auto;">
+              <div id="qrcode" align="center"></div>
+             </div>
+             <br />
+            </div>
+            <li>
+             <div id="time" style="display: flex; justify-content: center; align-items: center;">
+              <span>请在：</span>
+              <input type="hidden" id="day_show" />
+              <input type="hidden" id="hour_show" />
+              <span id="minute_show" style="font-size:24px;color:#e74c3c"></span>分 
+              <span id="second_show" style="font-size:24px;color:#e74c3c"></span>秒 
+              <span> 内支付</span>
+             </div></li>
+           </ul>
+          </div>
+         </div>
+         <div class="box-body">
+          <div style="font-size:16px;text-align:center">
+           USDT购买及支付指南
+          </div>
+          <div>
+           视频教程：
+          </div>
+          
+          <div>
+           大陆线路*精简版*6分钟 
+           <a class="btn btn-xs btn-default copy-btn" style="color:#e74c3c" target="_blank" href="https://v.youku.com/v_show/id_XNTA5NTc5MTk4OA">点击观看</a>
+          </div>
+          <!--<div>大陆线路*完全版*19分钟 <a class="btn btn-xs btn-default copy-btn" style="color:#e74c3c" target="_blank" href="https://www.ixigua.com/6924189094192873486">点击观看</a></div>
+                    -->
+          <div>
+           &nbsp;
+          </div>
+          <div>
+           不知道如何使用？请务必认真看完以上视频教程！
+          </div>
+          <div>
+           1.注册会员 -- 2.兑换USDT -- 3.提币转账
+          </div>
+          <div>
+           三步即可完成支付！完全稳定！价格更优！
+          </div>
+          <div>
+           &nbsp;
+          </div>
+         
+          <div>
+           &nbsp;
+          </div>
+          <div>
+           推荐交易所：
+           <font style="color:#e74c3c">（请务必在以下官网下载APP，以免下载山寨版造成损失）</font>
+          </div>
+          <div>
+           <div style="float:left">
+            <div>
+             OKEX交易所
+            </div>
+            <div>
+             网页版 
+             <a class="btn btn-xs btn-default copy-btn" style="color:#e74c3c" target="_blank" href="https://www.okexcn.com">点击跳转</a>
+            </div>
+            <div>
+             APP下载 
+             <a class="btn btn-xs btn-default copy-btn" style="color:#e74c3c" target="_blank" href="https://www.okexcn.com/download">点击去下载</a>
+            </div>
+           </div>
+           <div style="float:right">
+            <div>
+             火币交易所
+            </div>
+            <div>
+             网页版 
+             <a class="btn btn-xs btn-default copy-btn" style="color:#e74c3c" target="_blank" href="https://www.huobi.be">点击跳转</a>
+            </div>
+            <div>
+             APP下载 
+             <a class="btn btn-xs btn-default copy-btn" style="color:#e74c3c" target="_blank" href="https://www.huobi.be/zh-cn/download/">点击去下载</a>
+            </div>
+           </div>
+           <div style="clear:both">
+            &nbsp;
+           </div>
+          </div>
+         </div>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div>
+   </div>
+  </div>
+  <script>
+    var clipboard = new ClipboardJS('#copy', {
+        text: function() {
+            return $("#copy").attr("data-clipboard-text");
+        }
+    });
+    var clipboard2 = new ClipboardJS('#copy2', {
+        text: function() {
+            return $("#copy2").attr("data-clipboard-text");
+        }
+    });
+    
+    var qrcode = new QRCode("qrcode", {
+        width: 100, 
+        height: 100,
+    });
+    qrcode.makeCode($("#copy").attr("data-clipboard-text"));
+    
+    
+    //时间倒计时
+    var intDiff = parseInt($("#time_exist").val());//倒计时总秒数量
+    var timeID;
+    
+    var day = 0;
+    var hour = 0;
+    var minute = 0;
+    var second = 0;
+    if(intDiff > 0){
+        day = Math.floor(intDiff / (60 * 60 * 24));
+        hour = Math.floor(intDiff / (60 * 60)) - (day * 24);
+        minute = Math.floor(intDiff / 60) - (day * 24 * 60) - (hour * 60);
+        second = Math.floor(intDiff) - (day * 24 * 60 * 60) - (hour * 60 * 60) - (minute * 60);
+    }
+    else{
+        $("#qrcode").remove();
+        $("#time").html("二维码已过期，请不要支付");
+        $("#address").html("地址：过期");
+        $("#copy").hide();
+    }
+    if (minute <= 9) minute = '0' + minute;
+    if (second <= 9) second = '0' + second;
+    $('#day_show').html(day+"天");
+    $('#hour_show').html('<s id="h"></s>'+hour+'');
+    $('#minute_show').html('<s></s>'+minute+'');
+    $('#second_show').html('<s></s>'+second+'');
+    intDiff--;
+
+    function timer(intDiff){
+        timeID = window.setInterval(function() {
+            var day = 0;
+            var hour = 0;
+            var minute = 0;
+            var second = 0;
+            if(intDiff > 0){
+                day = Math.floor(intDiff / (60 * 60 * 24));
+                hour = Math.floor(intDiff / (60 * 60)) - (day * 24);
+                minute = Math.floor(intDiff / 60) - (day * 24 * 60) - (hour * 60);
+                second = Math.floor(intDiff) - (day * 24 * 60 * 60) - (hour * 60 * 60) - (minute * 60);
+            }
+            else{
+                window.clearInterval(timeID);//停止计时器
+                $("#qrcode").remove();
+                $("#time").html("二维码已过期，请不要支付");
+                $("#address").html("地址：过期");
+                $("#copy").hide();
+            }
+            if (minute <= 9) minute = '0' + minute;
+            if (second <= 9) second = '0' + second;
+            $('#day_show').html(day+"天");
+            $('#hour_show').html('<s id="h"></s>'+hour+'');
+            $('#minute_show').html('<s></s>'+minute+'');
+            $('#second_show').html('<s></s>'+second+'');
+            intDiff--;
+        }, 1000);
+    }
+    timer(intDiff);
+    
+    
+    var intervalOrderInfo = setInterval(function () {
+        $.post("/Api_pay/query", {
+            order_sn: "{{info.order_sn}}"
+        }, function (response) {
+            var data = response;
+            //console.log(data)
+            var status = data.data.status
+            if (status == 2 ) {
+                clearInterval(intervalOrderInfo);
+                $("body").html("<h1><center style='color:green;'>付款成功</center></h1>")
+                //location.reload()
+            } else{
+                if( status != 1 ){
+                    clearInterval(intervalOrderInfo);
+                    $("body").html("<h1><center>订单异常，请刷新页面</center></h1>")
+                }
+            }
+        }, "json");
+    }, 1000);
+  </script>
+ </body>
+</html>

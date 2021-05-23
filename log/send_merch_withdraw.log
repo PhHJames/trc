@@ -1,0 +1,32 @@
+[info] 2021-05-22 21:47:41  给商户发送提现通知结果 系统单号：20210522975453974851,发送参数：{"order_no":"20210522975453974851","txid":"","status":2,"fixed_poundage":"1.00000000","money":"65.99788807","merch_order":"TEST1621691178","sign":"94a49122fdb5a8810b24d67ab0ff208a"} , 商户响应：<html>
+<head><title>302 Found</title></head>
+<body bgcolor="white">
+<center><h1>302 Found</h1></center>
+<hr><center>bfe/1.0.8.18</center>
+</body>
+</html>
+
+[info] 2021-05-22 21:48:38  给商户发送提现通知结果 系统单号：20210522565552524854,发送参数：{"order_no":"20210522565552524854","txid":"","status":2,"fixed_poundage":"1.00000000","money":"65.99788807","merch_order":"TEST1621691304","sign":"2ab4d8370aba489f82cf4fbb0f24ad73"} , 商户响应：<html>
+<head><title>302 Found</title></head>
+<body bgcolor="white">
+<center><h1>302 Found</h1></center>
+<hr><center>bfe/1.0.8.18</center>
+</body>
+</html>
+
+[info] 2021-05-22 21:49:07  给商户发送提现通知结果 系统单号：202105221005050515250,发送参数：{"order_no":"202105221005050515250","txid":"","status":2,"fixed_poundage":"1.00000000","money":"65.99788807","merch_order":"TEST1621691341","sign":"77aebfc775ce12597908095a32a711dc"} , 商户响应：<html>
+<head><title>302 Found</title></head>
+<body bgcolor="white">
+<center><h1>302 Found</h1></center>
+<hr><center>bfe/1.0.8.18</center>
+</body>
+</html>
+
+[info] 2021-05-22 21:50:31  给商户发送提现通知结果 系统单号：202105229848981015451,发送参数：{"order_no":"202105229848981015451","txid":"","status":2,"fixed_poundage":"1.00000000","money":"15.15151515","merch_order":"TEST1621691418","sign":"e0f661c3cb46c2a544286280d83f14d3"} , 商户响应：<html>
+<head><title>302 Found</title></head>
+<body bgcolor="white">
+<center><h1>302 Found</h1></center>
+<hr><center>bfe/1.0.8.18</center>
+</body>
+</html>
+

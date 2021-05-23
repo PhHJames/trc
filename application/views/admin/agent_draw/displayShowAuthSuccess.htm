@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{{siteName}}-审核提现通过页面</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="{{layerCssPath}}?version={{version}}" media="all">
+    <link rel="stylesheet" href="{{layerStaticDomain}}/style/admin.css?version={{version}}" media="all">
+</head>
+<body>
+<div class="layui-card-body layui-form">
+
+    {% if txid == ''  %}
+    <form id="myform" onsubmit="return false" >
+        <input type="hidden" name="id" value="{{info.id}}" >
+        <input type="hidden" name="action" value="trans" >
+        <div class="layui-form-item">
+            <label class="layui-form-label">选择系统币地址转款：<span style="color: #FF5722;">*</span></label>
+            <div class="layui-input-inline">
+                <select name="address" >
+                    <option value="">请选择</option>
+                    {% for keys , it in SummaryAccount%}
+                    <option value="{{it.address}}">{{it.name}} 余额：{{it.money.usdt}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">提币地址：</label>
+            <div class="layui-input-block">
+                <input type="text" disabled class="layui-input" value="{{bank_info.address}}">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">二维码：</label>
+            <div class="layui-input-block" id="show_qr">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">提现币数量</label>
+            <div class="layui-input-block">
+                <input type="text" disabled class="layui-input" value="{{info.money}}">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">手续费</label>
+            <div class="layui-input-block">
+                <input type="text" disabled class="layui-input" value="{{info.fixed_poundage}}">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">备注信息</label>
+            <div class="layui-input-block">
+                <textarea name="remark"  class="layui-textarea"></textarea>
+            </div>
+        </div>
+        <blockquote class="layui-elem-quote">
+            注意打款之后需要在进行一步确认操作，才算成功
+        </blockquote>
+        <div class="layui-form-item box-center" style="text-align: center;">
+            <button class="layui-btn" id="submitBtn">点我直接打款给代理，此操作不可逆转 请慎重操作</button>
+        </div>
+    </form>
+    {% else %}
+    <form id="myform" onsubmit="return false" >
+        <input type="hidden" name="id" value="{{info.id}}" >
+        <input type="hidden" name="action" value="confirm" >
+        <input type="hidden" name="status" value="3" >
+        <div class="layui-form-item">
+            <label class="layui-form-label">交易id：</label>
+            <div class="layui-input-block">
+                <a href="https://tronscan.io/#/transaction/{{txid}}" target="_blank" title="点我查看交易状态">{{txid}}</a>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">提币地址：</label>
+            <div class="layui-input-block">
+                <input type="text" disabled class="layui-input" value="{{bank_info.address}}">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">提现币数量</label>
+            <div class="layui-input-block">
+                <input type="text" disabled class="layui-input" value="{{info.money}}">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">手续费</label>
+            <div class="layui-input-block">
+                <input type="text" disabled class="layui-input" value="{{info.fixed_poundage}}">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">备注信息</label>
+            <div class="layui-input-block">
+                <textarea name="remark"  class="layui-textarea">{{info.remark}}</textarea>
+            </div>
+        </div>
+        <blockquote class="layui-elem-quote">
+            注意打款之后，点击下面的按钮进行商户提现最终审核
+        </blockquote>
+        {% if info.status == 1   %}
+        <div class="layui-form-item box-center" style="text-align: center;">
+            <button class="layui-btn layui-btn-normal" id="submitBtn">点我直接操作代理资金进行确认</button>
+        </div>
+        {% else %}
+        <div class="layui-form-item box-center" style="text-align: center;">
+            <button class="layui-btn layui-btn-normal" >无操作。。。</button>
+        </div>
+        {% endif %}
+    </form>
+    {% endif %}
+
+</div>
+<script src="{{layerStaticDomain}}/layui/layui.js"></script>
+<script src="{{layerStaticDomain}}/static/js/jquery.min.js"></script>
+<script src="{{layerStaticDomain}}/static/js/qrcode.min.js"></script>
+
+<script type="text/javascript">
+    {% if txid == ''  %}
+    new QRCode(document.getElementById("show_qr"), {
+        text: "{{bank_info.address}}",
+        width: 128,
+        height: 128,
+        colorDark : "#000000",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.H
+    });
+    {% endif %}
+    /**/
+</script>
+
+
+<script>
+    layui.config({
+        version: "{{version}}",
+        base: '{{layerStaticDomain}}/' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'form', 'upload'], function(){
+        var $ = layui.$
+            ,form = layui.form
+            ,upload = layui.upload
+            ,element = layui.element;
+        // 表单数据提交
+        $('#submitBtn').click(function () {
+            var loading = null ;
+            layer.confirm('是否确认此操作不可逆转？', function(index){
+                layer.close(index);
+                $.ajax({
+                    type:'POST',
+                    url: '/Admin_Agentwithdraw/auth',
+                    data: $('#myform').serializeArray(),
+                    dataType: 'JSON',
+                    success: function (res) {
+                        layer.close(loading);
+                        if( res['code'] != 1 ){
+                            layer.msg(res['msg'] , {icon : 5 } )
+                            return ;
+                        }
+                        layer.alert('操作成功', {closeBtn : false }, function(){
+                            location.reload()
+                        });
+                    },
+                    beforeSend: function(){
+                        loading = layer.load(0, {shade: [0.1,'#fff']})
+                    },
+                    error: function (){
+                        layer.close(loading)
+                        layer.msg("网络繁忙请稍后" , {icon : 5 } )
+                    }
+                });
+            });
+        });
+    });
+</script>
+</body>
+</html>

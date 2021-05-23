@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{{siteName}}-代理商统计</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="{{layerCssPath}}?version={{version}}" media="all">
+    <link rel="stylesheet" href="{{layerStaticDomain}}/style/admin.css?version={{version}}" media="all">
+</head>
+<body>
+
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-row layui-col-space15">
+                <div class="layui-col-md12">
+                    <div class="layui-card">
+                        <div class="layui-tab layui-tab-brief layadmin-latestData">
+                            <ul class="layui-tab-title">
+                                <li class="layui-this">订单数统计</li>
+                                <li>币数量统计</li>
+                            </ul>
+                            <div class="layui-tab-content">
+                                <div class="layui-tab-item layui-show">
+                                    <div class="layui-card-body">
+                                        <form  id="myform_1" class="layui-form"  onsubmit="return false ">
+                                            <div class="layui-row layui-col-space10 layui-form-item">
+                                                <div class="layui-form-item">
+                                                    <div class="layui-inline">
+                                                        <label class="layui-form-label">日期</label>
+                                                        <div class="layui-input-inline">
+                                                            <input type="text" value="{{begin_date}}" name="begin_date" readonly class="layui-input" id="test-laydate-start" placeholder="开始日期">
+                                                        </div>
+                                                        <div class="layui-form-mid">
+                                                            -
+                                                        </div>
+                                                        <div class="layui-input-inline">
+                                                            <input type="text"  value="{{end_date}}" name="end_date" readonly class="layui-input" id="test-laydate-end" placeholder="结束日期">
+                                                        </div>
+                                                    </div>
+                                                    <div class="layui-inline">
+                                                        <button id="search_1" class="layui-btn layuiadmin-btn-comm" data-type="reload" lay-submit="" lay-filter="LAY-app-contcomm-search">
+                                                            <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+                                        </form>
+                                    </div>
+                                    <table id="table_src"></table>
+                                </div>
+                                <div class="layui-tab-item">
+                                    <div class="layui-card-body">
+                                        <form  id="myform_2" class="layui-form"  onsubmit="return false ">
+                                            <div class="layui-row layui-col-space10 layui-form-item">
+                                                <div class="layui-form-item">
+                                                    <div class="layui-inline">
+                                                        <label class="layui-form-label">日期</label>
+                                                        <div class="layui-input-inline">
+                                                            <input type="text" value="{{begin_date}}" name="begin_date" readonly class="layui-input" id="test-laydate-start-2" placeholder="开始日期">
+                                                        </div>
+                                                        <div class="layui-form-mid">
+                                                            -
+                                                        </div>
+                                                        <div class="layui-input-inline">
+                                                            <input type="text"  value="{{end_date}}" name="end_date" readonly class="layui-input" id="test-laydate-end-2" placeholder="结束日期">
+                                                        </div>
+                                                    </div>
+                                                    <div class="layui-inline">
+                                                        <button id="search_2" class="layui-btn layuiadmin-btn-comm" data-type="reload" lay-submit="" >
+                                                            <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+                                        </form>
+                                    </div>
+                                    <table id="table_src_1"></table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{layerStaticDomain}}/layui/layui.js"></script>
+<script>
+    layui.config({
+        version: "{{version}}",
+        base: '{{layerStaticDomain}}/' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'form', 'table', 'laydate'] , function () {
+        var laydate = layui.laydate;
+        var $ = layui.$
+            ,admin = layui.admin
+            ,element = layui.element
+            ,form = layui.form,
+            table = layui.table;
+        form.render(null, 'component-form-element');
+
+        //开始日期
+        var insStart = laydate.render({
+            elem: '#test-laydate-start'
+        });
+
+        //结束日期
+        var insEnd = laydate.render({
+            elem: '#test-laydate-end'
+        });
+
+        //开始日期
+        var insStart = laydate.render({
+            elem: '#test-laydate-start-2'
+        });
+
+        //结束日期
+        var insEnd = laydate.render({
+            elem: '#test-laydate-end-2'
+        });
+
+        table.render({
+            elem: '#table_src'
+            ,url:'{{getu("Agent_Statistics/order_number" , "action=order_number")}}'
+            ,title: '订单数'
+            ,toolbar: true
+            ,defaultToolbar:[]
+            ,cols: [[
+                {field:'show_days', title:'日期'},
+                {field:'success_num', title:'成功订单数量'},
+                {field:'wait_pay_num', title:'待付款订单数'},
+                {field:'total', title:'总订单数'},
+            ]]
+            ,where : getWhere_1()
+            ,id: 'tables_id'
+            //,page: false
+            //,limits: [10,20,30,40,50] // 每页展示条数
+            // ,limit: {{pageSize}} // 每页默认显示的数量;注意：需要和后台首次传递过来的条数相同
+        });
+
+        table.render({
+            elem: '#table_src_1'
+            ,url:'{{getu("Agent_Statistics/order_money" , "action=order_money")}}'
+            ,title: '币数量统计'
+            ,toolbar: true
+            ,defaultToolbar:[]
+            ,cols: [[
+                {field:'show_days', title:'日期'},
+                {field:'wait_pay_money', title:'待付款订单币数量'},
+                {field:'success_money', title:'成功到代理商钱包币数量'},
+                {field:'total_money', title:'总订单币数量'},
+            ]]
+            ,where : getWhere_2()
+            ,id: 'tables_id_2'
+            ,page: false
+            //,limits: [10,20,30,40,50] // 每页展示条数
+            // ,limit: {{pageSize}} // 每页默认显示的数量;注意：需要和后台首次传递过来的条数相同
+        });
+
+        $('#search_1').click(function () {
+            search_1();
+        });
+        function search_1() {
+            var $where = getWhere_1();
+            table.reload('tables_id', {
+                where: $where
+            });
+        }
+        function getWhere_1(){
+            var _data = $("#myform_1").serializeArray()
+            var  o_data = {}
+            for( var i in _data ){
+                o_data[_data[i]['name']] = _data[i]['value']
+            }
+            return o_data
+        }
+
+
+        $('#search_2').click(function () {
+            search_2();
+        });
+        function search_2() {
+            var $where = getWhere_2();
+            table.reload('tables_id_2', {
+                where: $where
+            });
+        }
+        function getWhere_2(){
+            var _data = $("#myform_2").serializeArray()
+            var  o_data = {}
+            for( var i in _data ){
+                o_data[_data[i]['name']] = _data[i]['value']
+            }
+            return o_data
+        }
+    });
+</script>
+</body>
+</html>
+

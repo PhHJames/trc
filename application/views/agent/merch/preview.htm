@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>{{siteName}}--查看商户</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet" href="{{layerCssPath}}?version={{version}}" media="all">
+  <link rel="stylesheet" href="{{layerStaticDomain}}/style/admin.css?version={{version}}" media="all">
+</head>
+<body>
+  <div class="layui-card-body layui-form">
+      <div class="layui-card">
+          <div class="layui-card-body">
+              <div class="layui-tab layui-tab-brief" lay-filter="component-tabs-hash">
+                  <ul class="layui-tab-title">
+                      <li class="layui-this" lay-id="11">基本信息</li>
+                      <li lay-id="22">费率设置</li>
+                  </ul>
+                  <div class="layui-tab-content">
+                      <div class="layui-tab-item layui-show">
+                          <div class="layui-card">
+                              <div class="layui-card-body layui-text">
+                                  <table class="layui-table">
+                                      <colgroup>
+                                          <col width="200">
+                                          <col>
+                                      </colgroup>
+                                      <tbody>
+                                      <tr>
+                                          <td>商户手机号码</td>
+                                          <td>
+                                              {{info['phone']}}
+                                          </td>
+                                      </tr>
+                                      <tr>
+                                          <td>异步回调地址</td>
+                                          <td>
+                                              {{info['notify_url']|default('无')}}
+                                          </td>
+                                      </tr>
+                                      <tr>
+                                          <td>补单异步回调地址</td>
+                                          <td>
+                                              {{info['supplement_url']|default('无')}}
+                                          </td>
+                                      </tr>
+                                      <tr>
+                                          <td>appid</td>
+                                          <td>
+                                              {{info['appid']}}
+                                          </td>
+                                      </tr>
+
+                                      <tr>
+                                          <td>秘钥</td>
+                                          <td>
+                                              {{info['appsecret']}}
+                                          </td>
+                                      </tr>
+
+                                      <tr>
+                                          <td>白名单</td>
+                                          <td>
+                                              {{info['white_list_ip']|raw}}
+                                          </td>
+                                      </tr>
+                                      </tbody>
+                                  </table>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="layui-tab-item">
+                          <div class="layui-card">
+                              <div class="layui-card-body layui-text">
+                                  <table class="layui-table">
+                                      <colgroup>
+                                          <col width="200">
+                                          <col>
+                                      </colgroup>
+                                      <tbody>
+                                      <tr>
+                                          <td>通道名称</td>
+                                          <td>
+                                              商户开通的费率
+                                          </td>
+                                          <td>
+                                              商户通道状态
+                                          </td>
+                                          <td>操作</td>
+                                      </tr>
+                                      {% for it in channel%}
+                                      <tr>
+                                          <td>{{it.name}}</td>
+                                          <td>
+                                              {{it.merch_channel.fee|default("无")}}
+                                          </td>
+                                          <td>
+                                              {% if  it['merch_channel']['c_status'] == 1 %}
+                                              可用
+                                              {% else %}
+                                              不可用
+                                              {% endif %}
+                                          </td>
+                                          <td>
+                                              <button data-channelid="{{it.channel_id}}"  data-agent-channelid="{{it.id}}" data-cid="{{it['merch_channel']['c_id']}}" class="layui-btn layui-btn-normal layui-btn-radius setting">设置</button>
+                                          </td>
+                                      </tr>
+                                      {% endfor %}
+                                      </tbody>
+                                  </table>
+                              </div>
+                          </div>
+                      </div>
+
+                  </div>
+              </div>
+          </div>
+      </div>
+
+
+
+  </div>
+  <script src="{{layerStaticDomain}}/layui/layui.js"></script>  
+  <script>
+      layui.config({
+        version: "{{version}}",
+        base: '{{layerStaticDomain}}/' //静态资源所在路径
+      }).extend({
+        index: 'lib/index' //主入口模块
+      }).use(['index', 'form'], function(){
+        var $ = layui.$
+        ,form = layui.form
+        ,element = layui.element;
+        $(".setting").click( function(){
+            var _cid = $(this).attr("data-cid")
+            var mid = "{{info.mid}}"
+            var channel_id =   $(this).attr("data-channelid")
+            var agent_channelid = $(this).attr("data-agent-channelid")
+            _table = layer.open({
+                type: 2
+                ,title: "设置费率" // 标题
+                ,content: "{{getu('Agent_Merch/settingFee')}}?mid="+mid+"&cid="+_cid +"&channel_id="+channel_id  + "&agent_channelid="+agent_channelid // url
+                ,maxmin: false // 是否可以全屏
+                ,area: ['400px', '60%'] // 弹出层的宽/高
+            });
+        })
+});
+</script>
+</body>
+</html>

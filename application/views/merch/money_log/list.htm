@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{{siteName}}-资金日志</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="{{layerCssPath}}?version={{version}}" media="all">
+    <link rel="stylesheet" href="{{layerStaticDomain}}/style/admin.css?version={{version}}" media="all">
+</head>
+<body>
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto">
+            <div class="layui-card-body">
+                <form  id="myform" class="layui-form"  onsubmit="return false ">
+                    <div class="layui-row layui-col-space10 layui-form-item">
+                        <div class="layui-col-lg3">
+                            <label class="layui-form-label">资金类型：</label>
+                            <div class="layui-input-inline">
+                                <select name="type" >
+                                    <option value="">请选择</option>
+                                    {% for keys , it in typeData%}
+                                    <option value="{{keys}}">{{it.value}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-row layui-col-space10 layui-form-item">
+                        <div class="layui-col-lg6">
+                            <label class="layui-form-label"></label>
+                            <div class="layui-input-inline">
+                                <button id="search" class="layui-btn layuiadmin-btn-comm" data-type="reload" lay-submit="" lay-filter="LAY-app-contcomm-search">
+                                    <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+
+    </div>
+    <div class="layui-row">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-body">
+                    <table class="layui-hide" id="table_src" lay-filter="test"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{layerStaticDomain}}/layui/layui.js"></script>
+<script>
+    var _table = null;
+    layui.config({
+        version: "{{version}}",
+        base: '{{layerStaticDomain}}/' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'form', 'table'],function(){
+        var $ = layui.$
+            ,admin = layui.admin
+            ,element = layui.element
+            ,form = layui.form,
+            table = layui.table;
+        form.render(null, 'component-form-element');
+        table.render({
+            elem: '#table_src'
+            ,url:'/Merch_Moneylog/index?inajax=1'
+            ,title: '管理'
+            ,toolbar: true
+            ,defaultToolbar:['filter']
+            ,cols: [[
+                {field:'typeString', title:'操作', width:150},
+                {field:'account_money', title:'变动前账户币数量', width:180},
+                {field:'money', title:'变动币数量', width:120},
+                {field:'now_money', title:'变动后账户币数量', width:180},
+                {field:'create_time', title:'操作时间',sort: false},
+                {field:'remark', title:'备注', minWidth: 150 , width:300},
+            ]]
+            ,id: 'tables_id'
+            ,page: true
+            ,limits: [10,20,30,40,50] // 每页展示条数
+            ,limit: {{pageSize}} // 每页默认显示的数量;注意：需要和后台首次传递过来的条数相同
+    });
+        $('#search').click(function () {
+            search();
+        });
+        $(".withdraw").click( function(){
+            withdraw(  )
+        })
+        $('#search_ipt').keydown(function (event) {
+            if (event.keyCode === 13) {
+                search();
+            }
+        });
+
+        function search() {
+            var $where = getWhere();
+            table.reload('tables_id', {
+                page: {
+                    curr: 1 //重新从第 1 页开始
+                }
+                ,where: $where
+            });
+        };
+        function getWhere(){
+            var _data = $("#myform").serializeArray()
+            var  o_data = {}
+            for( var i in _data ){
+                o_data[_data[i]['name']] = _data[i]['value']
+            }
+            return o_data
+        }
+
+    });
+    // 用于role_add或者role_edit页面调用;
+    function closeAndLoadData(){
+        layer.close(_table); // 销毁layer弹出层
+    }
+
+</script>
+</body>
+</html>

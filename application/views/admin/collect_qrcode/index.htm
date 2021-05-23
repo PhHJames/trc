@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{{siteName}}-二维码管理</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="{{layerCssPath}}?version={{version}}" media="all">
+    <link rel="stylesheet" href="{{layerStaticDomain}}/style/admin.css?version={{version}}" media="all">
+    <style>
+        .layui-table-cell {
+            height: 60px;
+            line-height: 60px;
+        }
+        th .layui-table-cell {
+            height: 30px;
+            line-height: 30px;
+        }
+        th .laytable-cell-1-0-7 {
+            height: 30px;
+            line-height: 30px;
+        }
+        .layui-table img {
+            width: 100px;
+            height: 60px;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto">
+            <div class="layui-card-body">
+                <form  id="myform" class="layui-form"  onsubmit="return false ">
+                    <div class="layui-row layui-col-space10 layui-form-item">
+                        <div class="layui-col-lg3">
+                            <label class="layui-form-label">二维码id：</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="qr_id"   class="layui-input">
+                            </div>
+                        </div>
+
+                        <!--<div class="layui-col-lg3">
+                            <label class="layui-form-label">码商账号：</label>
+                            <div class="layui-input-inline">
+                                <input class="layui-input" name="account"   autocomplete="off">
+                            </div>
+                        </div>-->
+
+                        <div class="layui-col-lg3">
+                            <label class="layui-form-label">币地址：</label>
+                            <div class="layui-input-inline">
+                                <input class="layui-input" name="content" placeholder="请输入币地址查询" autocomplete="off">
+                            </div>
+                        </div>
+
+                        <div class="layui-col-lg3">
+                            <label class="layui-form-label">状态：</label>
+                            <div class="layui-input-inline">
+                                <select name="status" >
+                                    <option value="99">请选择</option>
+                                    {% for keys , it in statusData%}
+                                    <option value="{{keys}}">{{it.value}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="layui-col-lg3">
+                            <label class="layui-form-label">激活：</label>
+                            <div class="layui-input-inline">
+                                <select name="active" >
+                                    <option value="99">请选择</option>
+                                    <option value="1">是</option>
+                                    <option value="0">否</option>
+                                </select>
+                            </div>
+                        </div>
+
+
+                        <div class="layui-col-lg3">
+                            <label class="layui-form-label"></label>
+                            <div class="layui-input-inline">
+                                <button id="search" class="layui-btn layuiadmin-btn-comm" data-type="reload" lay-submit="" lay-filter="LAY-app-contcomm-search">
+                                    <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+        </div>
+
+
+    </div>
+    <div class="layui-card-body">
+        <div style="padding-bottom: 10px;">
+            <button class="layui-btn layui-btn-normal layui-btn-radius add" >添加币地址</button>
+
+        </div>
+
+    </div>
+    <div class="layui-card-body">
+        <blockquote class="layui-elem-quote layui-quote-nm">
+            <p><a href="https://tronscan.io/" target="_blank" style="color:blue">1、点击我去官网查询地址和交易信息</a></p>
+            <p>2、注意此处的币地址主要是用户付款使用的！！</p>
+            <p>3、只有开启了自动匹配， 那么才会匹配到此币地址。</p>
+            <p>4、只有激活的地址才能匹配订单！</p>
+            <p>5、<span style="color:red;">页面显示的trx和usdt数量可能会有延迟，如果要查看实时余额请点击查看按钮即可</span></p>
+            <p>6、默认创建的账号是没有上链，是离线钱包！！</p>
+        </blockquote>
+    </div>
+    
+    <div class="layui-card-body">
+        <blockquote class="layui-elem-quote layui-quote-nm">
+            
+            系统总的TRX数量：<span style="color:red;">{{totalData.trx}} </span>，总的usdt数量：<span style="color:red;">{{totalData.usdt}} </span>
+        </blockquote>
+    </div>
+    <div class="layui-row">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-body">
+
+                    <table class="layui-hide" id="table_src" lay-filter="test"></table>
+                    {% verbatim %}
+
+                    <script type="text/html" id="test-table-toolbar-toolbarDemo">
+                        <div class="layui-btn-container">
+                            <button class="layui-btn layui-btn-primary layui-btn-sm" title="批量充值TRX" lay-event="beatchRechargeTrx">批量充值TRX</button>
+                            <button title="批量转出到归集账户" class="layui-btn layui-btn-sm layui-btn-normal" lay-event="beatchOut">
+                                批量转出到归集账户
+                            </button>
+
+                            <button class="layui-btn layui-btn-primary layui-btn-sm" title="批量TRX转出" lay-event="beatchOutTrx">批量TRX转出</button>
+
+                        </div>
+                    </script>
+
+
+                    <script type="text/html" id="test-table-switchTpl">
+                        <!-- 这里的 checked 的状态只是演示 -->
+                        <input type="checkbox" lay-filter="test-table-status" name="status" lay-skin="switch" lay-text="正常|禁用"
+                               value="{{ d.status }}" data-json="{{ encodeURIComponent(JSON.stringify(d)) }}" {{ d.status == 1 ? 'checked' : '' }}>
+                    </script>
+
+                    <script type="text/html" id="show_img">
+                        <a href="{{ d.path_pic }}" target="_blank"><img src="{{ d.path_pic }}" alt="" width="80" height="80"></a>
+                    </script>
+                    <script type="text/html" id="test-table-auto-match">
+                        <!-- 这里的 checked 的状态只是演示 -->
+                        <input type="checkbox" lay-filter="test-table-auto-match" name="auto_match" lay-skin="switch" lay-text="开启|关闭"
+                               value="{{ d.qr_id }}"  {{ d.auto_match == 1 ? 'checked' : '' }}>
+                    </script>
+                    <script type="text/html" id="test-table-auto-active">
+                        <!-- 这里的 checked 的状态只是演示 -->
+                        <input type="checkbox" lay-filter="test-table-auto-active" name="active" lay-skin="switch" lay-text="是|否"
+                               value="{{ d.qr_id }}"  {{ d.active == 1 ? 'checked' : '' }}>
+                    </script>
+
+                    <script type="text/html" id="address_id">
+                        <a  title="点我查询地址信息----" target="_blank" style="color:blue;" href="https://tronscan.io/#/address/{{ d.content }}" >{{ d.content }}</a>
+                    </script>
+                    {% endverbatim %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="beatch_trx_div" style="display: none ">
+    <div class="layui-card-body">
+        <blockquote class="layui-elem-quote">
+            <p>1：把系统内置的账号里面的 TRX 往收款币地址里面转，主要是为了归集使用</p>
+            <p>2: 收款的地址归集到一个系统账户里面的时候需要消耗 TRX ,一定要保证里面有 TRX </p>
+            <p style="color:red; font-size: 20px">3：此操作是 充值 TRX </p>
+
+        </blockquote>
+    </div>
+    <div class="layui-card-body layui-form">
+        <form   action="/Admin_Collectqrcode/beatch_trans_trx"  method="GET" target="_blank">
+            <input type="hidden" name="qr_ids" value="" id="trx_qr_ids">
+            <div class="layui-form-item">
+                <label class="layui-form-label">系统内置TRX账户：<span style="color: #FF5722;">*</span></label>
+                <div class="layui-input-inline">
+                    <select name="address" >
+                        <option value="">请选择</option>
+                        {% for keys , it in TrxList%}
+                        <option value="{{it.address}}">{{it.name}} 余额：{{it.money.trx}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">数量：<span style="color: #FF5722;">*</span></label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" name="amount" placeholder="请输入币数量">
+                </div>
+                <div class="layui-form-mid layui-word-aux" ><b style="color:red;">请输入数量必须大于0</b></div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">授权密码：<span style="color: #FF5722;">*</span></label>
+                <div class="layui-input-inline">
+                    <input type="password" class="layui-input" name="password" placeholder="请输入授权密码">
+                </div>
+                <div class="layui-form-mid layui-word-aux" ><b style="color:red;">请输入授权密码</b></div>
+            </div>
+            <div class="layui-form-item box-center" style="text-align: center;">
+                <button class="layui-btn" id="submitTrxBtn">提交</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="beatch_usdt_div" style="display: none ">
+    <div class="layui-card-body">
+        <blockquote class="layui-elem-quote">
+            <p>1：收款账号里面的USDT转出到系统的归集账号里面</p>
+            <p>2: 一定要保证收款账号里面有 TRX 否则无法转出 </p>
+            <p style="color: blue; font-size: 18px; font-weight: bold ; ">3: 一定要确保用户钱包里面至少 5个以上的 TRX ,否则会提示能量不足 无法转出 </p>
+        </blockquote>
+    </div>
+    <div class="layui-card-body layui-form">
+        <form   action="/Admin_Collectqrcode/beatch_trans_usdt"  method="GET" target="_blank">
+            <input type="hidden" name="qr_ids" value="" id="usdt_qr_ids">
+            <div class="layui-form-item">
+                <label class="layui-form-label">系统内置USDT TRC账户：<span style="color: #FF5722;">*</span></label>
+                <div class="layui-input-inline">
+                    <select name="address" >
+                        <option value="">请选择</option>
+                        {% for keys , it in SummaryAccount%}
+                        <option value="{{it.address}}">{{it.name}} 余额：{{it.money.usdt}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">数量</label>
+                <div class="layui-input-inline">
+                    <!--<input type="text" class="layui-input" name="amount" placeholder="请输入币数量">-->
+                    <font style="color:red;">数量是账户里面全部转出，必须保证每个收款账号里面有TRX币至少1个否则无法转出</font>
+                </div>
+                <!--<div class="layui-form-mid layui-word-aux" ><b style="color:red;">请输入数量必须大于0</b></div>-->
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">授权密码：<span style="color: #FF5722;">*</span></label>
+                <div class="layui-input-inline">
+                    <input type="password" class="layui-input" name="password" placeholder="请输入授权密码">
+                </div>
+                <div class="layui-form-mid layui-word-aux" ><b style="color:red;">请输入授权密码</b></div>
+            </div>
+            <div class="layui-form-item box-center" style="text-align: center;">
+                <button class="layui-btn" id="submitUSDTBtn">提交</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+<div id="beatch_trx_out_div" style="display: none ">
+    <div class="layui-card-body">
+        <blockquote class="layui-elem-quote">
+            <p>1：收款账号里面的TRX转出到系统的TRX账号里面</p>
+            <p>2: 一定要保证收款账号里面有 TRX 否则无法转出 </p>
+            <p style="color: blue; font-size: 18px; font-weight: bold ; ">3: 此操作是全部转出 </p>
+        </blockquote>
+    </div>
+    <div class="layui-card-body layui-form">
+        <form   action="/Admin_Collectqrcode/beatch_trans_out_trx"  method="GET" target="_blank">
+            <input type="hidden" name="qr_ids" value="" id="trx_qr_out_ids">
+            <div class="layui-form-item">
+                <label class="layui-form-label">系统内置TRX账户：<span style="color: #FF5722;">*</span></label>
+                <div class="layui-input-inline">
+                    <select name="address" >
+                        <option value="">请选择</option>
+                        {% for keys , it in TrxList%}
+                        <option value="{{it.address}}">{{it.name}} trx余额：{{it.money.trx}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">数量</label>
+                <div class="layui-input-inline">
+                    <font style="color:red;">数量是账户里面全部转出，必须保证每个收款账号里面有TRX币否则无法转出</font>
+                </div>
+                <!--<div class="layui-form-mid layui-word-aux" ><b style="color:red;">请输入数量必须大于0</b></div>-->
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">授权密码：<span style="color: #FF5722;">*</span></label>
+                <div class="layui-input-inline">
+                    <input type="password" class="layui-input" name="password" placeholder="请输入授权密码">
+                </div>
+                <div class="layui-form-mid layui-word-aux" ><b style="color:red;">请输入授权密码</b></div>
+            </div>
+            <div class="layui-form-item box-center" style="text-align: center;">
+                <button class="layui-btn" id="submitUSDTBtn">提交</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<script type="text/html" id="role">
+    <a class="layui-btn layui-btn-xs" lay-event="preview_money">查看余额</a>
+    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="preview">查看</a>
+    <!--
+    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+-->
+
+</script>
+<script src="{{layerStaticDomain}}/layui/layui.js"></script>
+<script>
+    var _table = null;
+    layui.config({
+        version: "{{version}}",
+        base: '{{layerStaticDomain}}/' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'form', 'table'],function(){
+        var $ = layui.$
+            ,admin = layui.admin
+            ,element = layui.element
+            ,form = layui.form,
+            table = layui.table;
+        form.render(null, 'component-form-element');
+        table.render({
+            elem: '#table_src'
+            ,url:'{{getu("Admin_Collectqrcode/index" , "inajax=1")}}'
+            ,title: '后台用户'
+            ,toolbar: '#test-table-toolbar-toolbarDemo'
+            ,defaultToolbar:['filter']
+            ,cols: [[
+                {type: 'checkbox', fixed: 'left'},
+                {field:'qr_id', title:'编号', width:80, align : 'center'},
+                {field:'trx', title:'trx数量', align : 'center', width:150 , sort : true },
+                {field:'usdt', title:'usdt数量', align : 'center', width:150 , sort : true },
+                //{field:'chain_name', title:'链名称', align : 'center'},
+                {field:'content', title:'币地址', align : 'center', width:230,templet: '#address_id' },
+                { title:'二维码图片',  templet : '#show_img', align : 'center' },
+                {field:'create_time', title:'创建时间', sort: true, align : 'center' , hide : true },
+                {field:'update_time', title:'更新日期', sort: true, align : 'center' , hide : true },
+
+                //{field:'success_money', title:'累计成功金额', align : 'center'},
+               // {field:'error_money', title:'累计失败金额', align : 'center'},
+                {field:'auto_match', title:'自动匹配',templet: '#test-table-auto-match'},
+                //{field:'active', title:'激活',templet: '#test-table-auto-active'},
+                {field:'statusString', title:'状态', width:80, align : 'center'},
+                {field:'remark', title:'备注', width:100, align : 'center' , hide : true },
+                {field:'match_index', title:'匹配指数', width:100, align : 'center' , hide : true },
+                {title:'操作', toolbar: '#role', minWidth:100, width:150 , fixed: 'right'}
+
+            ]]
+            ,id: 'tables_id'
+            ,page: true
+            ,limits: [10,20,30,40,50] // 每页展示条数
+            ,limit: {{pageSize}} // 每页默认显示的数量;注意：需要和后台首次传递过来的条数相同
+    });
+
+        table.on('sort(test)', function(obj) { //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+            console.log(obj.field); //当前排序的字段名
+            console.log(obj.type); //当前排序类型：desc（降序）、asc（升序）、null（空对象，默认排序）
+            console.log(this); //当前排序的 th 对象
+
+            var $where = getWhere();
+            $where.field = obj.field
+            $where.order = obj.type
+
+            //尽管我们的 table 自带排序功能，但并没有请求服务端。
+            //有些时候，你可能需要根据当前排序的字段，重新向服务端发送请求，从而实现服务端排序，如：
+            table.reload('tables_id', { //testTable是表格容器id
+                initSort: obj //记录初始排序，如果不设的话，将无法标记表头的排序状态。 layui 2.1.1 新增参数
+                , where: $where
+            })
+        });
+
+            //头工具栏事件
+        table.on('toolbar(test)', function(obj){
+            var checkStatus = table.checkStatus(obj.config.id);
+            switch(obj.event){
+                case 'beatchRechargeTrx':
+                    var data = checkStatus.data;
+                    if(data.length <= 0 ){
+                        layer.msg("请选择选项进行操作")
+                        return false
+                    }
+                    beatchRechargeTrx(data)
+                    break;
+                case 'beatchOut':
+                    var data = checkStatus.data;
+                    if(data.length <= 0 ){
+                        layer.msg("请选择选项进行操作")
+                        return false
+                    }
+                    beatchRechargeUsdt(data)
+                    break;
+                case 'beatchOutTrx':
+                    var data = checkStatus.data;
+                    if(data.length <= 0 ){
+                        layer.msg("请选择选项进行操作")
+                        return false
+                    }
+                    beatchOutTrx(data)
+                    break;
+            };
+        });
+
+        function beatchRechargeTrx(data){
+            var str = getAllStr(data)
+            $("#trx_qr_ids").val(str)
+            layer.open({
+                title:'批量转入TRX'
+                ,type: 1
+                //,skin: 'layui-layer-rim'
+                ,shadeClose: true
+                ,area: admin.screen() < 2 ? ['80%', '300px'] : ['700px', '500px']
+                ,content: $("#beatch_trx_div")
+            });
+        }
+        function beatchOutTrx(data) {
+            var str = getAllStr(data)
+            $("#trx_qr_out_ids").val(str)
+            layer.open({
+                title:'批量转出TRX'
+                ,type: 1
+                ,shadeClose: true
+                ,area: admin.screen() < 2 ? ['80%', '300px'] : ['700px', '500px']
+                ,content: $("#beatch_trx_out_div")
+            });
+        }
+        function beatchRechargeUsdt(data){
+            var str = getAllStr(data)
+            $("#usdt_qr_ids").val(str)
+            layer.open({
+                title:'批量把USDT转入到归集账户'
+                ,type: 1
+                //,skin: 'layui-layer-rim'
+                ,shadeClose: true
+                ,area: admin.screen() < 2 ? ['80%', '300px'] : ['700px', '500px']
+                ,content: $("#beatch_usdt_div")
+            });
+        }
+
+
+        function getAllStr( data ){
+            var str = ''
+            var hash = []
+            for(var it in data ){
+                hash.push(data[it].qr_id)
+            }
+            str = hash.join(',')
+            return str ;
+        }
+
+        //监听状态操作
+        /*form.on('switch(test-table-status)', function(obj){
+          var json = JSON.parse(decodeURIComponent($(this).data('json')));
+          layer.tips(this.value + ' ' + this.name + '：'+ obj.elem.checked, obj.othis);
+          json = table.clearCacheKey(json);
+          console.log(json); //当前行数据
+        });*/
+        form.on('switch', function (data) {
+            var onShow = data.elem.checked ? 1 : 0 ;
+            if(data.elem.name == 'auto_match' ){
+                auto_match( data.value , onShow )
+            }else if(data.elem.name == 'active' ){
+                active_address( data.value , onShow )
+            }
+            //changeTableVal('hospital', 'hid', data.value, data.elem.name, onShow);
+        })
+        // 操作功能
+        table.on('tool(test)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'preview_money'){
+                preview_money(data.qr_id)
+            }else if (obj.event === 'preview'){
+                preview(data.qr_id)
+            }
+        });
+        $('#search').click(function () {
+            search();
+        });
+
+        $(".add").click(function () {
+            addQr()
+        })
+        function addQr(){
+            var title = '添加币地址',
+                _url = "/Admin_Collectqrcode/add", // 权限数据请求地址
+                flag = true; // 用于判断关闭按钮触发还是数据提交触发
+            var area = ['80%', '80%']
+            _table = layer.open({
+                type: 2
+                ,title: title // 标题
+                ,content: _url  // url
+                ,maxmin: true // 是否可以全屏
+                ,area: area // 弹出层的宽/高
+                ,end: function () { // 页面销毁后执行
+                    if (flag) { // 数据提交触发
+                        var $where = getWhere();
+                        table.reload('tables_id', {
+                            where: $where
+                        });
+                    }
+                }
+                ,cancel: function () { // 右上角关闭按钮触发的回调
+                    flag = false;
+                }
+            });
+        }
+
+        function preview(qr_id){
+            _table = layer.open({
+                type: 2
+                ,title: "查看币地址" // 标题
+                ,content: "{{getu('Admin_Collectqrcode/preview' )}}?qr_id="+qr_id  // url
+                ,maxmin: true // 是否可以全屏
+                ,area: ['80%', '60%'] // 弹出层的宽/高
+                ,shadeClose : true
+            });
+        }
+
+        function preview_money( qr_id ){
+            $.ajax({
+                type:'POST',
+                url: '{{getu("Admin_Collectqrcode/get_balance")}}',
+                data:  {qr_id : qr_id } ,
+                dataType: 'JSON',
+                success: function (res) {
+                    layer.close(loading);
+                    if( res['code'] != 1 ){
+                        layer.msg(res['msg'] , {icon : 5 } )
+                        return ;
+                    }
+                    var data = res.data
+                    //var str = JSON.stringify(data)
+                    var str = JSON.stringify(data, null, 4);
+
+                    layer.alert(str , {closeBtn:false , shadeClose : true , title : '余额查看' }  )
+                    /*$("#get_balance").val( str )
+                    $("#show_balance").html("<pre>"+str+"</pre>")*/
+                    //$("#private_key").val( res.data.privatekey )
+                    /*layer.alert(res['msg'], { closeBtn : false }, function(){
+                        location.reload()
+                    });*/
+                },
+                beforeSend: function(){
+                    loading = layer.load(0, {shade: [0.1,'#fff']})
+                },
+                error: function (){
+                    layer.close(loading)
+                    layer.msg("网络繁忙请稍后" , {icon : 5 } )
+                }
+            });
+        }
+
+
+        $('#search_ipt').keydown(function (event) {
+            if (event.keyCode === 13) {
+                search();
+            }
+        });
+
+        function search() {
+            var $where = getWhere();
+            table.reload('tables_id', {
+                page: {
+                    curr: 1 //重新从第 1 页开始
+                }
+                ,where: $where
+            });
+        };
+        function getWhere(){
+            var _data = $("#myform").serializeArray()
+            var  o_data = {}
+            for( var i in _data ){
+                o_data[_data[i]['name']] = _data[i]['value']
+            }
+            return o_data
+        }
+        // 添加权限或者编辑权限
+        function addOrEdit(mid){
+            var title = '添加码商',
+                _url = "{{getu('Admin_Collectuser/add')}}", // 权限数据请求地址
+                flag = true; // 用于判断关闭按钮触发还是数据提交触发
+            var area = ['60%', '50%']
+            if (mid > 0  ) {
+                title = '修改商户';
+                _url = "{{getu('Admin_Collectuser/edit')}}?user_id="+mid
+                area = ['60%', '50%']
+            }
+            _table = layer.open({
+                type: 2
+                ,title: title // 标题
+                ,content: _url  // url
+                ,maxmin: true // 是否可以全屏
+                ,area: area // 弹出层的宽/高
+                ,end: function () { // 页面销毁后执行
+                    if (flag) { // 数据提交触发
+                        var $where = getWhere();
+                        table.reload('tables_id', {
+                            where: $where
+                        });
+                    }
+                }
+                ,cancel: function () { // 右上角关闭按钮触发的回调
+                    flag = false;
+                }
+            });
+        }
+        function auto_match(qr_id , auto_match){
+            var loading = null ;
+            $.ajax({
+                type:'POST',
+                url: '{{getu("Admin_Collectqrcode/auto_match")}}',
+                data: {qr_id : qr_id ,auto_match : auto_match } ,
+                dataType: 'JSON',
+                success: function (res) {
+                    layer.close(loading);
+                    if( res['code'] != 1 ){
+                        layer.msg(res['msg'] , {icon : 5 } )
+                        return ;
+                    }
+                    table.reload('tables_id', {
+                        page: {
+                            curr: 1 //重新从第 1 页开始
+                        }
+                        ,where: getWhere()
+                    });
+                },
+                beforeSend: function(){
+                    loading = layer.load(0, {shade: [0.1,'#fff']})
+                },
+                error: function (){
+                    layer.close(loading)
+                    layer.msg("网络繁忙请稍后" , {icon : 5 } )
+                }
+            });
+        }
+        function active_address(qr_id , auto_match){
+            var loading = null ;
+            $.ajax({
+                type:'POST',
+                url: '{{getu("Admin_Collectqrcode/active")}}',
+                data: {qr_id : qr_id ,active : auto_match } ,
+                dataType: 'JSON',
+                success: function (res) {
+                    layer.close(loading);
+                    if( res['code'] != 1 ){
+                        layer.msg(res['msg'] , {icon : 5 } )
+                        return ;
+                    }
+                    table.reload('tables_id', {
+                        page: {
+                            curr: 1 //重新从第 1 页开始
+                        }
+                        ,where: getWhere()
+                    });
+                },
+                beforeSend: function(){
+                    loading = layer.load(0, {shade: [0.1,'#fff']})
+                },
+                error: function (){
+                    layer.close(loading)
+                    layer.msg("网络繁忙请稍后" , {icon : 5 } )
+                }
+            });
+        }
+
+
+
+
+    });
+    // 用于role_add或者role_edit页面调用;
+    function closeAndLoadData(){
+        layer.close(_table); // 销毁layer弹出层
+    }
+
+</script>
+</body>
+</html>

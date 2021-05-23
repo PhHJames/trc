@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{{siteName}}-数据统计</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="{{layerCssPath}}?version={{version}}" media="all">
+    <link rel="stylesheet" href="{{layerStaticDomain}}/style/admin.css?version={{version}}" media="all">
+</head>
+<body>
+
+
+
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+
+        <div class="layui-col-md12">
+            <div class="layui-card-body">
+                <div class="layui-card-body">
+                    <blockquote class="layui-elem-quote">
+                        <p>1、时间范围查询只支持30天的查询。</p>
+                    </blockquote>
+                </div>
+                <form  id="myform" class="layui-form"  action="/Admin_Merchant/statis">
+                    <input type="hidden" name="mid" value="{{mid}}">
+                    <div class="layui-row layui-col-space10 layui-form-item">
+                        <div class="layui-col-lg3">
+                            <label class="layui-form-label">时间</label>
+                            <div class="layui-input-inline" style="width: 100px;">
+                                <input type="text" readonly id="test-laydate-normal-cn"  value="{{begin_date}}" name="begin_date" placeholder="" autocomplete="off" class="layui-input">
+                            </div>
+                            <div class="layui-form-mid">-</div>
+                            <div class="layui-input-inline" style="width: 100px;">
+                                <input readonly  id="test-laydate-normal-cn2" type="text" value="{{end_date}}" name="end_date" placeholder="" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-col-lg3">
+                            <label class="layui-form-label"></label>
+                            <div class="layui-input-inline">
+                                <button id="search" class="layui-btn layuiadmin-btn-comm" data-type="reload" lay-submit="" lay-filter="LAY-app-contcomm-search">
+                                    <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="layui-card">
+                <div class="layui-card-body">
+                    <table class="layui-table" lay-size="lg">
+                        <thead>
+                        <tr>
+                            <th>日期</th>
+                            <th>订单数</th>
+                            <th>币数量</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for keys , it in list%}
+                        <tr>
+                            <td style="color:blue;">{{it.day}}</td>
+                            <td>
+                                <p>总订单：{{it.total_order_num}}</p>
+                                <p>成功订单：{{it.success_order_num}}</p>
+                                <p>失败订单：{{it.error_order_num}}</p>
+                            </td>
+                            <td>
+                                <p>总的币数量：{{it.total_order_money}}</p>
+                                <p>成功付款币数量：{{it.success_order_money}}</p>
+                                <p>失败币数量：{{it.error_order_money}}</p>
+                                <p>成功到商户币数量：{{it.success_merch_money}}</p>
+                            </td>
+
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{{layerStaticDomain}}/layui/layui.js"></script>
+
+<script>
+    layui.config({
+        version: "{{version}}",
+        base: '{{layerStaticDomain}}/' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'form', 'upload', 'laydate'],function () {
+        var $ = layui.$
+            ,form = layui.form
+            ,upload = layui.upload
+            ,element = layui.element;
+        var laydate = layui.laydate;
+        laydate.render({
+            elem: '#test-laydate-normal-cn'
+        });
+        laydate.render({
+            elem: '#test-laydate-normal-cn2'
+        });
+
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>{{siteName}}--查看订单</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet" href="{{layerCssPath}}?version={{version}}" media="all">
+  <link rel="stylesheet" href="{{layerStaticDomain}}/style/admin.css?version={{version}}" media="all">
+</head>
+<body>
+  <div class="layui-card-body layui-form">
+      <div class="layui-card">
+          <div class="layui-card-body layui-text">
+              <table class="layui-table">
+                  <colgroup>
+                      <col width="200">
+                      <col>
+                  </colgroup>
+                  <tbody>
+                  <tr>
+                      <td>系统订单号</td>
+                      <td>
+                          {{info['order_sn']}}
+                      </td>
+                  </tr>
+                  <tr>
+                      <td>商户订单</td>
+                      <td>
+                          {{info['merch_order_sn']}}
+                      </td>
+                  </tr>
+                  <tr>
+                      <td>交易单号</td>
+                      <td><a target="_blank" href="https://tronscan.io/#/transaction/{{info['txid']}}">{{info['txid']}}</a></td>
+                  </tr>
+                  <!--<tr>
+                      <td>外部单号</td>
+                      <td>{{info['out_order_sn']}}</td>
+                  </tr>-->
+                  <!--<tr>
+                      <td>交易单号</td>
+                      <td>{{info['trans_order_sn']}}</td>
+                  </tr>-->
+                  <tr>
+                      <td>下单人民币</td>
+                      <td>￥{{info['r_money']}}</td>
+                  </tr>
+                  <tr>
+                      <td>汇率(人民币 > {{info['channel_name']}})</td>
+                      <td>{{info['e_rate']}}</td>
+                  </tr>
+                  <tr>
+                      <td>汇率({{info['channel_name']}} > 人民币)</td>
+                      <td>{{info['f_rate']}}</td>
+                  </tr>
+                  <tr>
+                      <td>下单金额单位：{{info['currency_name']}}</td>
+                      <td>{{info['money']}}</td>
+                  </tr>
+
+
+
+                  <tr>
+                      <td>实际到账商户币数量</td>
+                      <td>{{info['real_money']}}（商户费率：{{info['m_fee']}}）</td>
+                  </tr>
+                  <tr>
+                      <td>实际到账代理币数量</td>
+                      <td>{{info['agent_real_money']}}（代理费率：{{info['a_fee']}}）</td>
+                  </tr>
+                  <tr>
+                      <td>平台赚的币数量</td>
+                      <td>{{info['p_real_money']}}</td>
+                  </tr>
+                  <tr>
+                      <td>通道</td>
+                      <td>{{channel['name']}}</td>
+                  </tr>
+                  <tr>
+                      <td>收款地址</td>
+                      <td>{{info['address']}}</td>
+                  </tr>
+                  <tr>
+                      <td>异步回调地址</td>
+                      <td>{{info['notify_url']}}</td>
+                  </tr>
+
+                  <tr>
+                      <td>订单创建日期</td>
+                      <td>{{info['create_date']}}</td>
+                  </tr>
+
+                  <tr>
+                      <td>订单完成时间</td>
+                      <td>{{info['complete_date']}}</td>
+                  </tr>
+
+                  <tr>
+                      <td>订单状态</td>
+                      <td>{{info['status_string']}}</td>
+                  </tr>
+
+                  <tr>
+                      <td>下单IP（这个一般是商户那边的服务器IP）</td>
+                      <td>{{info['ip']}}</td>
+                  </tr>
+                  <tr>
+                      <td>商户那边的用户的下单IP</td>
+                      <td>{{info['m_client_ip']}}</td>
+                  </tr>
+                  <tr>
+                      <td>下游异步回调状态</td>
+                      <td>{{info['rsync_status_string']}}</td>
+                  </tr>
+
+                  <tr>
+                      <td>异步回调结果</td>
+                      <td><textarea readonly class="layui-textarea" >{{info['rsync_message']|raw}}</textarea></td>
+                  </tr>
+                  <tr>
+                      <td>通知次数</td>
+                      <td>{{info['notify_num']}}</td>
+                  </tr>
+                  {% if supplement %}
+                  <tr>
+                      <td style="color:darkred">补单相关数据</td>
+                      <td>备注：{{supplement['remark']|raw}}
+                          <br>
+                          时间：{{supplement['create_date']}}
+                      </td>
+                  </tr>
+                  {% endif %}
+                  </tbody>
+              </table>
+          </div>
+      </div>
+
+  </div>
+  <script src="{{layerStaticDomain}}/layui/layui.js"></script>  
+  <script>
+      layui.config({
+        version: "{{version}}",
+        base: '{{layerStaticDomain}}/' //静态资源所在路径
+      }).extend({
+        index: 'lib/index' //主入口模块
+      }).use(['index', 'form'], function(){
+        var $ = layui.$
+        ,form = layui.form
+        ,element = layui.element;
+        // 表单数据提交
+
+});
+</script>
+</body>
+</html>

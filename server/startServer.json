@@ -1,0 +1,6 @@
+{
+  "name"             : "usdt2_0_server", 
+  "script"           : "server.js",
+  "error_file"       : "/home/wwwlogs/usdt2_0_server.error.log",
+  "out_file"         : "/home/wwwlogs/usdt2_0_server.out.log"
+}

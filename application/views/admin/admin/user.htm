@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>{{siteName}}-后台用户</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet" href="{{layerCssPath}}?version={{version}}" media="all">
+  <link rel="stylesheet" href="{{layerStaticDomain}}/style/admin.css?version={{version}}" media="all">
+</head>
+<body>
+  <div class="layui-fluid">
+    <div class="layui-card">
+      <div class="layui-form layui-card-header layuiadmin-card-header-auto">
+          <div class="layui-card-body">
+            <div class="test-table-reload-btn" >
+              <div class="layui-inline">
+                <label class="layui-form-label">登录名</label>
+                <div class="layui-input-inline">
+                  <input class="layui-input" name="username" placeholder="请输入登录名搜索" id="search_ipt" autocomplete="off">
+                </div>
+              </div>
+              <div class="layui-inline">
+                <label class="layui-form-label">管理员</label>
+                <div class="layui-input-inline">
+                <select name="super" id="super">
+                    <option value="">请选择</option>
+                    <option value="1">是</option>
+                    <option value="2">否</option>
+                </select>
+                </div>
+              </div>
+              <div class="layui-inline">
+                <div class="layui-input-inline">
+                  <button id="search" class="layui-btn layuiadmin-btn-comm" data-type="reload" lay-submit="" lay-filter="LAY-app-contcomm-search">
+                  <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+                  </button>
+                </div>
+              </div>
+              
+            </div>
+            <hr class="layui-bg-gray" />
+            <blockquote class="layui-elem-quote">后台管理员数据,如果权限组的权限更新要及时的,<a lay-href="{{getu('admin_cache/index')}}" class="layui-badge">清除权限缓存</a></blockquote>
+          </div>
+       
+        </div>
+      <div class="layui-card-body">
+        <div style="padding-bottom: 10px;">
+          <button class="layui-btn layui-btn-normal layui-btn-radius add">添加后台用户</button>
+        </div>
+        
+      </div>
+    </div>
+    <div class="layui-row">
+      <div class="layui-col-md12">
+        <div class="layui-card">
+          <div class="layui-card-body">
+           
+            <table class="layui-hide" id="table_src" lay-filter="test"></table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script type="text/html" id="role">
+    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+<!--
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+-->
+  </script>
+  <script src="{{layerStaticDomain}}/layui/layui.js"></script>  
+  <script>
+    var _table = null; 
+    layui.config({
+      version: "{{version}}",
+      base: '{{layerStaticDomain}}/' //静态资源所在路径
+    }).extend({
+      index: 'lib/index' //主入口模块
+    }).use(['index', 'form', 'table'],function(){
+      var $ = layui.$
+      ,admin = layui.admin
+      ,element = layui.element
+      ,form = layui.form,
+      table = layui.table;
+      form.render(null, 'component-form-element');
+      table.render({
+        elem: '#table_src'
+        ,url:'{{getu("admin_admin/user" , "inajax=1")}}'
+        ,title: '后台用户'
+        ,toolbar: true
+        ,defaultToolbar:['filter']
+        ,cols: [[
+          {field:'user_id', title:'编号', width:100, minWidth: 60, sort: true},
+          {field:'username', title:'登录账号', minWidth: 150},
+          {field:'nick', title:'昵称', minWidth: 150},
+          {field:'addtime', title:'添加时间', minWidth: 150, sort: true},
+          {field:'login_num', title:'登录次数', minWidth: 150, sort: true},
+          {field:'role_str', title:'角色',minWidth: 150,templet:function(res){
+              return res.role_str  ? res.role_str : "暂无" ;
+          }},
+          {field:'status', title:'状态', width:80, templet: function(res){
+            if (res.status == '1') {
+              return '<button class="layui-btn layui-btn-normal layui-btn-xs">正常</button>';
+            } else if(res.status == '2') {
+              return '<button class="layui-btn layui-btn-danger layui-btn-xs">已禁用</button>' ;
+            }else{
+                return '未知';
+            }
+          }},
+          {field:'super', title:'管理员', width:90, templet: function(res){
+            if (res.super == '1') {
+              return '<button class="layui-btn layui-btn-normal layui-btn-xs">是</button>'
+            } else {
+              return '<em>否</em>'
+            }
+          }},
+          {title:'操作', toolbar: '#role', minWidth:100, width:150}
+        ]]
+        ,id: 'tables_id'
+        ,page: true
+        ,limits: [10,20,30,40,50] // 每页展示条数
+        ,limit: {{pageSize}} // 每页默认显示的数量;注意：需要和后台首次传递过来的条数相同
+      });
+      
+      // 操作功能
+      table.on('tool(test)', function(obj){
+        var data = obj.data;
+        if(obj.event === 'edit'){
+          addOrEdit(data.user_id)
+        }else if (obj.event === 'del'){
+          deleteUser(data.user_id)
+        }
+      });
+      
+      $(".add").click(function(){
+          addOrEdit(0)
+      });
+
+      $('#search').click(function () {
+        search();
+      });
+      
+      $('#search_ipt').keydown(function (event) {
+        if (event.keyCode === 13) {
+          search();
+        }
+      });
+    
+      function search() {
+        var $val = $('#search_ipt').val().trim();
+        var $super = $('#super').val().trim();
+        var $where = getWhere();
+        table.reload('tables_id', {
+          page: {
+            curr: 1 //重新从第 1 页开始
+          }
+          ,where: $where
+        });
+      };
+      function getWhere(){
+          var $val = $('#search_ipt').val().trim();
+          var $super = $('#super').val().trim();
+          return {
+              username: $val,
+              super : $super
+          };
+      }
+      // 添加权限或者编辑权限
+      function addOrEdit(user_id){
+        var title = '添加后台用户',
+        _url = "{{getu('admin_admin/userAdd')}}", // 权限数据请求地址
+        flag = true; // 用于判断关闭按钮触发还是数据提交触发
+        if (user_id > 0  ) {
+          title = '修改后台用户';
+          _url = "{{getu('admin_admin/userEdit')}}?user_id="+user_id
+        }
+        _table = layer.open({
+            type: 2
+            ,title: title // 标题
+            ,content: _url  // url
+            ,maxmin: true // 是否可以全屏
+            ,area: ['80%', '80%'] // 弹出层的宽/高
+            ,end: function () { // 页面销毁后执行
+              if (flag) { // 数据提交触发
+                var $where = getWhere();
+                table.reload('tables_id', {
+                  where: $where
+                });
+              }
+            }
+            ,cancel: function () { // 右上角关闭按钮触发的回调
+              flag = false;
+            }
+        });
+      }
+      function deleteUser(user_id){
+        layer.confirm('是否删除用户id为:' + user_id + " 此操作不可恢复" , {
+            btn: ['是','否'] //按钮
+          }, function(){
+            $.ajax({
+              type:'POST',
+              url: '{{getu("admin_admin/userDel")}}',
+              data: { user_id : user_id },
+              dataType: 'JSON',
+              success: function (res) {
+                  layer.close(loading);
+                  if( res['code'] != 1 ){
+                    layer.msg(res['msg'] , {icon : 5 } )
+                    return ;
+                  }
+                  var $success = layer.alert('删除成功', {}, function(){
+                      layer.close($success);
+                      table.reload('tables_id');
+                  });
+              },
+              beforeSend: function(){
+                loading = layer.load(0, {shade: [0.1,'#fff']})
+              },
+              error: function (){
+                layer.close(loading)
+                layer.msg("网络繁忙请稍后" , {icon : 5 } )
+              }
+            });
+        });
+      }
+  });
+  // 用于role_add或者role_edit页面调用;
+  function closeAndLoadData(){ 
+    layer.close(_table); // 销毁layer弹出层
+  }
+  
+  </script>
+</body>
+</html>
